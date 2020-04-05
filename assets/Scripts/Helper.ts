@@ -11,15 +11,4 @@ export default class Helper
     {
         return (Math.random() * (max - min)) + min;
     }
-
-    public static Assert = class
-    {
-        public static isNotNull(obj: any): boolean
-        {
-            if (obj == null)
-                throw new Error("Object is null");
-
-            return true;
-        }
-    }
 }

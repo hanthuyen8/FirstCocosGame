@@ -1,0 +1,184 @@
+{
+  "__type__": "cc.AnimationClip",
+  "_name": "Demo",
+  "_objFlags": 0,
+  "_native": "",
+  "_duration": 18.291666666666668,
+  "sample": 24,
+  "speed": 1,
+  "wrapMode": 1,
+  "curveData": {
+    "paths": {
+      "Content_Box/title_0": {
+        "props": {
+          "active": [
+            {
+              "frame": 0,
+              "value": false
+            },
+            {
+              "frame": 1.25,
+              "value": true
+            }
+          ],
+          "y": [
+            {
+              "frame": 0,
+              "value": 0
+            },
+            {
+              "frame": 3.1666666666666665,
+              "value": 0
+            },
+            {
+              "frame": 4.416666666666667,
+              "value": 178
+            }
+          ]
+        }
+      },
+      "cursor": {
+        "props": {
+          "active": [
+            {
+              "frame": 0,
+              "value": false
+            },
+            {
+              "frame": 14.125,
+              "value": true
+            }
+          ],
+          "position": [
+            {
+              "frame": 0,
+              "value": [
+                -96.473,
+                -15.319,
+                0
+              ]
+            },
+            {
+              "frame": 15.833333333333334,
+              "value": [
+                -96.473,
+                -15.319,
+                0
+              ]
+            },
+            {
+              "frame": 16.583333333333332,
+              "value": [
+                96.33,
+                54.489,
+                0
+              ]
+            },
+            {
+              "frame": 17.208333333333332,
+              "value": [
+                96.33,
+                54.489,
+                0
+              ]
+            },
+            {
+              "frame": 18.291666666666668,
+              "value": [
+                96.33,
+                -206.46,
+                0
+              ]
+            }
+          ]
+        }
+      },
+      "Content_Box/Drags/3": {
+        "props": {
+          "position": [
+            {
+              "frame": 17.208333333333332,
+              "value": [
+                0,
+                121.45,
+                0
+              ]
+            },
+            {
+              "frame": 18.291666666666668,
+              "value": [
+                0,
+                -131.877,
+                0
+              ]
+            }
+          ]
+        }
+      },
+      "Content_Box/bb_demo": {
+        "props": {
+          "active": [
+            {
+              "frame": 0,
+              "value": false
+            },
+            {
+              "frame": 10,
+              "value": true
+            }
+          ]
+        }
+      }
+    }
+  },
+  "events": [
+    {
+      "frame": 1.25,
+      "func": "bouncingNode",
+      "params": [
+        "Content_Box/title_0",
+        1,
+        1
+      ]
+    },
+    {
+      "frame": 1.7916666666666667,
+      "func": "playAudio",
+      "params": [
+        "title"
+      ]
+    },
+    {
+      "frame": 5,
+      "func": "fadeInAllNodes",
+      "params": []
+    },
+    {
+      "frame": 10.458333333333334,
+      "func": "playAudio",
+      "params": [
+        "how_to_play"
+      ]
+    },
+    {
+      "frame": 12.291666666666666,
+      "func": "flashingItems",
+      "params": []
+    },
+    {
+      "frame": 16.416666666666668,
+      "func": "hoverDrag",
+      "params": []
+    },
+    {
+      "frame": 17.208333333333332,
+      "func": "clickDrag",
+      "params": []
+    },
+    {
+      "frame": 18.291666666666668,
+      "func": "dropDrag",
+      "params": []
+    }
+  ]
+}
