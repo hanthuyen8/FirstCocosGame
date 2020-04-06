@@ -24,13 +24,14 @@ export default class Level extends cc.Component
     private waitTimeBetweenNode = 0.7;
 
     private _allInteractables: IInteractable[] = [];
+
+    private _isLevelLoaded = false;
     
     onLoad()
     {
         Assert.isNotEmpty(this.willFadeIn);
         Assert.isNotEmpty(this.allInteractables);
-        this.willFadeIn = FadeInData.regenerateNewFadeIn(this.willFadeIn);
-        this._allInteractables = InteractableHelper.getIInteractableFromNodes(this.allInteractables);
+        this.generatingData();
     }
 
     public show()
@@ -61,13 +62,24 @@ export default class Level extends cc.Component
         this.node.active = false;
     }
 
+    private generatingData()
+    {
+        if (this._isLevelLoaded)
+            return;
+        
+        this.willFadeIn = FadeInData.regenerateNewFadeIn(this.willFadeIn);
+        this._allInteractables = InteractableHelper.getIInteractableFromNodes(this.allInteractables);
+        this._isLevelLoaded = true;
+    }
+
     private resetLevel()
     {
+        this.generatingData();
+        this.disableInteractables();
         for (let i of this.willFadeIn)
         {
             i.anyNode.opacity = 0;
         }
-        this.disableInteractables();
     }
 
     public disableInteractables()

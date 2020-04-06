@@ -1,14 +1,27 @@
 export default class PromiseHelper
 {
-    public static bouncing(node: cc.Node, scaleRate: number, repeat: number)
+    public static newBasePromise()
     {
-        return new Promise((resolve, reject) =>
+        let cancelHandler;
+        let promise = new Promise<string>((resolve, reject) =>
+        { 
+            cancelHandler = reject;
+            resolve();
+        });
+
+        return { promise, cancelHandler };
+    }
+
+    public static bouncing(node: cc.Node, scaleRate: number, repeat: number) : Promise<string>
+    {
+        return new Promise<string>((resolve, reject) =>
         {
-            if (!node.activeInHierarchy)
+            /* if (!node.activeInHierarchy)
             {
                 reject("Promise cancel");
                 return;
-            }
+            } */
+            cc.log("bouncing promise: " + node.name);
             repeat = Math.max(1, repeat);
             cc.tween(node)
                 .repeat(repeat, cc.tween()
@@ -19,15 +32,16 @@ export default class PromiseHelper
         });
     }
 
-    public static fadeIn(anyNode: cc.Node, fadeSpeed: number): Promise<unknown>
+    public static fadeIn(anyNode: cc.Node, fadeSpeed: number): Promise<string>
     {
-        return new Promise((resolve, reject) =>
+        return new Promise<string>((resolve, reject) =>
         {
-            if (!anyNode.activeInHierarchy)
+            /* if (!anyNode.activeInHierarchy)
             {
                 reject("Promise cancel");
                 return;
-            }
+            } */
+            cc.log("fadeIn promise: " + anyNode.name);
             anyNode.opacity = 0;
             cc.tween(anyNode)
                 .to(fadeSpeed, { opacity: 255 })
@@ -36,15 +50,16 @@ export default class PromiseHelper
         });
     }
 
-    public static moveToPosition(anyNode: cc.Node, duration: number, toPosition: cc.Vec2): Promise<unknown>
+    public static moveToPosition(anyNode: cc.Node, duration: number, toPosition: cc.Vec2): Promise<string>
     {
-        return new Promise((resolve, reject) =>
+        return new Promise<string>((resolve, reject) =>
         {
-            if (!anyNode.activeInHierarchy)
+            /* if (!anyNode.activeInHierarchy)
             {
                 reject("Promise cancel");
                 return;
-            }
+            } */
+            cc.log("moveToPosition promise: " + anyNode.name);
             cc.tween(anyNode)
                 .to(duration, { position: toPosition })
                 .call(resolve)
@@ -64,15 +79,16 @@ export default class PromiseHelper
             .start();
     }
 
-    public static moveToNodeCallback(anyNode: cc.Node, duration: number, target: cc.Node, delta: cc.Vec2 = cc.Vec2.ZERO): Promise<unknown>
+    public static moveToNodeCallback(anyNode: cc.Node, duration: number, target: cc.Node, delta: cc.Vec2 = cc.Vec2.ZERO): Promise<string>
     {
-        return new Promise((resolve, reject) =>
+        return new Promise<string>((resolve, reject) =>
         {
-            if (!anyNode.activeInHierarchy)
+            /* if (!anyNode.activeInHierarchy)
             {
                 reject("Promise cancel");
                 return;
-            }
+            } */
+            cc.log("moveToNode promise: " + anyNode.name);
             let targetWorldPos = target.parent.convertToWorldSpaceAR(target.getPosition());
             let targetLocalPos = anyNode.parent.convertToNodeSpaceAR(targetWorldPos);
             // optional
@@ -85,7 +101,7 @@ export default class PromiseHelper
         });
     }
 
-    public static runParallel(callback: Promise<unknown>, ...theRest: (() => void)[]): Promise<unknown>
+    public static runParallel(callback: Promise<string>, ...theRest: (() => void)[]): Promise<string>
     {
         for (let f of theRest)
         {
@@ -94,9 +110,9 @@ export default class PromiseHelper
         return callback;
     }
 
-    public static wait(second: number): Promise<unknown>
+    public static wait(second: number): Promise<string>
     {
-        return new Promise((resolve, reject) =>
+        return new Promise<string>((resolve, reject) =>
         {
             setTimeout(resolve, second * 1000);
         });

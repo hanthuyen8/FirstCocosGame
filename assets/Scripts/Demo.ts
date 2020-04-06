@@ -55,6 +55,7 @@ export default class Demo extends cc.Component
     private _dragOriginalPos: cc.Vec2;
     private _titleOriginalPos: cc.Vec2;
     private _audioIsPlaying: Map<number, boolean> = new Map();
+    private _cancelDemoPromiseHandler: Function;
 
     onLoad()
     {
@@ -78,7 +79,10 @@ export default class Demo extends cc.Component
         let moveMouseDownABit = cc.v2(0, -30);
         this.node.active = true;
 
-        Promise.resolve()
+        let promiseHandler = PromiseHelper.newBasePromise();
+        this._cancelDemoPromiseHandler = promiseHandler.cancelHandler;
+
+        promiseHandler.promise
             // Show Title
             .then(() => PromiseHelper.wait(1))
             .then(() => PromiseHelper.fadeIn(this.title, 1))
@@ -123,6 +127,9 @@ export default class Demo extends cc.Component
 
     public stop()
     {
+        if (this._cancelDemoPromiseHandler)
+            this._cancelDemoPromiseHandler("cancel");
+        
         cc.Tween.stopAll();
         this._audioIsPlaying.forEach((v, k) => cc.audioEngine.stopEffect(k));
         this._audioIsPlaying.clear();
@@ -138,6 +145,7 @@ export default class Demo extends cc.Component
             return;
         }
 
+        cc.log("Play audio: " + audioName);
         let obj = this.allAudio.find(x => x.audioName === audioName);
         if (obj)
         {
@@ -151,13 +159,14 @@ export default class Demo extends cc.Component
     {
         return new Promise((resolve, reject) =>
         {
-            if (!MouseInput.audioCanPlay || !this.node.activeInHierarchy)
+            if (!MouseInput.audioCanPlay)// || !this.node.activeInHierarchy)
             {
                 cc.log("Audio cannot start: " + audioName);
                 resolve();
                 return;
             }
 
+            cc.log("Play audio: " + audioName);
             let obj = this.allAudio.find(x => x.audioName === audioName);
             if (obj)
             {
@@ -175,11 +184,11 @@ export default class Demo extends cc.Component
     {
         return new Promise((resolve, reject) =>
         {
-            if (!this.node.activeInHierarchy)
+            /* if (!this.node.activeInHierarchy)
             {
                 reject("Promise cancel");
                 return;
-            }
+            } */
             let index = 0;
             for (let i = 0; i < this.willFadeIn.length - 1; i++)
             {
@@ -204,11 +213,11 @@ export default class Demo extends cc.Component
     {
         return new Promise((resolve, reject) =>
         {
-            if (!this.node.activeInHierarchy)
+            /* if (!this.node.activeInHierarchy)
             {
                 reject("Promise cancel");
                 return;
-            }
+            } */
             let items = this.willFadeIn.filter(x => x.anyNode.group === ofGroup);
             if (items.length == 0)
             {
