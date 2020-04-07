@@ -10,18 +10,21 @@ const { ccclass } = cc._decorator;
 @ccclass
 export default class TweenSequence
 {
-    private _allTweens: cc.Tween<unknown>[] = [];
+    private _allTweens: NTween[] = [];
     private _tweenIndex = 0;
     private _onFinished: Function = null;
 
-    public play(onFinished : Function)
+    public play(onFinished: Function)
     {
+        if (this._allTweens.length > 0)
+            throw new Error("Cannot play tween with 0 items");
+
         this._tweenIndex = 0;
         this._onFinished = onFinished;
-        this._allTweens[this._tweenIndex].start();
+        this.nextTween();
     }
 
-    public addTween(...anyTween: cc.Tween<unknown>[])
+    public addTween(...anyTween: NTween[])
     {
         for (let t of anyTween)
         {
@@ -42,36 +45,40 @@ export default class TweenSequence
     }
 
     // Static Functions
-    public static bouncing(node: cc.Node, scaleRate: number, repeat: number): cc.Tween<unknown>
+
+    public static bouncing(node: cc.Node, scaleRate: number, repeat: number): NTween
     {
         cc.log("bouncing tween: " + node.name);
         repeat = Math.max(1, repeat);
 
-        return cc.tween(node)
-            .repeat(repeat, cc.tween()
-                .to(0.5, { scale: scaleRate })
-                .to(0.5, { scale: 1 })
-            );
+        return new NTween(
+            cc.tween(node)
+                .repeat(repeat, cc.tween()
+                    .to(0.5, { scale: scaleRate })
+                    .to(0.5, { scale: 1 })));
     }
 
-    public static fadeIn(anyNode: cc.Node, fadeSpeed: number): cc.Tween<unknown>
+    public static fadeIn(anyNode: cc.Node, fadeSpeed: number): NTween
     {
         cc.log("fadeIn tween: " + anyNode.name);
         anyNode.opacity = 0;
 
-        return cc.tween(anyNode)
-            .to(fadeSpeed, { opacity: 255 });
+        return new NTween(
+            cc.tween(anyNode)
+                .to(fadeSpeed, { opacity: 255 }));
     }
 
-    public static moveToPosition(anyNode: cc.Node, duration: number, toPosition: cc.Vec2): cc.Tween<unknown>
+    public static moveToPosition(anyNode: cc.Node, duration: number, toPosition: cc.Vec2): NTween
     {
         cc.log("moveToPosition tween: " + anyNode.name);
 
-        return cc.tween(anyNode)
-            .to(duration, { position: toPosition });
+        return new NTween(
+            cc.tween(anyNode)
+                .to(duration, { position: toPosition }));
     }
 
-    public static moveToNode(anyNode: cc.Node, duration: number, target: cc.Node, delta: cc.Vec2 = cc.Vec2.ZERO): cc.Tween<unknown>
+    public static moveToNode(anyNode: cc.Node, duration: number,
+        target: cc.Node, delta: cc.Vec2 = cc.Vec2.ZERO): NTween
     {
         let targetWorldPos = target.parent.convertToWorldSpaceAR(target.getPosition());
         let targetLocalPos = anyNode.parent.convertToNodeSpaceAR(targetWorldPos);
@@ -79,13 +86,71 @@ export default class TweenSequence
         targetLocalPos.x += delta.x;
         targetLocalPos.y += delta.y;
 
-        return cc.tween(anyNode)
-            .to(duration, { position: targetLocalPos });
+        return new NTween(
+            cc.tween(anyNode)
+                .to(duration, { position: targetLocalPos }));
     }
 
-    public static wait(second: number): cc.Tween<unknown>
+    public static wait(second: number): NTween
     {
-        return cc.tween().delay(second);
+        return new NTween(
+            cc.tween().delay(second));
     }
 
 }
+
+export class NTween
+{
+    public get isParallel(): boolean { return this._allTweens.length > 0; }
+    public get firstTween(): cc.Tween<unknown> { return this._allTweens[0]; }
+
+    private _allTweens: cc.Tween<unknown>[] = [];
+
+    constructor(tween: cc.Tween<unknown> = null)
+    {
+        if (tween != null)
+            this._allTweens.push(tween);
+    }
+
+    public call(callback: Function)
+    {
+        this._allTweens[this._allTweens.length - 1].call(callback);
+    }
+
+    public start()
+    {
+        this._allTweens.forEach(x => x.start());
+    }
+
+    public static newParallel(...tweens: Tweenable[]): NTween
+    {
+        let sequence = new NTween();
+        for (let i = 0; i < tweens.length; i++)
+        {
+            let t= tweens[i];
+            if (t instanceof NTween)
+            {
+                //let t = tweens[i] as NTween;
+                if (t.isParallel)
+                    throw new Error("Không được phép lồng các Parallel NTween với nhau.");
+                else
+                    sequence._allTweens.push(t.firstTween);
+            }
+            else if(t instanceof cc.Tween)
+            {
+                //let t = tweens[i] as cc.Tween<unknown>;
+                sequence._allTweens.push(t);
+            }
+            else if(t instanceof Function)
+            {
+                sequence._allTweens.push(
+                    cc.tween()
+                    .delay(0)
+                    .call(t));
+            }
+        }
+        return sequence;
+    }
+}
+
+type Tweenable = cc.Tween<unknown> | NTween | Function

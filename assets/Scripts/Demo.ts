@@ -12,6 +12,7 @@ import HoverEffect from "./HoverAndClick/HoverEffect";
 import ButtonColor, { ButtonState } from "./HoverAndClick/ButtonColor";
 import PromiseHelper from "./PromiseHelper";
 import Assert from "./Assert";
+import TweenSequence, { NTween } from "./TweenSequence";
 
 const { ccclass, property } = cc._decorator;
 
@@ -79,6 +80,21 @@ export default class Demo extends cc.Component
         let moveMouseDownABit = cc.v2(0, -30);
         this.node.active = true;
 
+        let baseTween = new TweenSequence();
+        baseTween.addTween(
+            TweenSequence.wait(1),
+            TweenSequence.fadeIn(this.title, 1),
+            NTween.newParallel(
+                TweenSequence.wait(2.5),
+                TweenSequence.bouncing(this.title, 1.1, 1),
+                () => this.playAudio("title")),
+            TweenSequence.moveToPosition(this.title, 1, this._titleOriginalPos),
+
+
+
+        )
+        );
+
         let promiseHandler = PromiseHelper.newBasePromise();
         this._cancelDemoPromiseHandler = promiseHandler.cancelHandler;
 
@@ -129,7 +145,7 @@ export default class Demo extends cc.Component
     {
         if (this._cancelDemoPromiseHandler)
             this._cancelDemoPromiseHandler("cancel");
-        
+
         cc.Tween.stopAll();
         this._audioIsPlaying.forEach((v, k) => cc.audioEngine.stopEffect(k));
         this._audioIsPlaying.clear();
