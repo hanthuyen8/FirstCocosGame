@@ -33,6 +33,27 @@ export default class TweenSequence
         }
     }
 
+    public addArrayOfTween(array: NTween[])
+    {
+        for (let t of array)
+        {
+            t.call(() => this.nextTween());
+            this._allTweens.push(t);
+        }
+    }
+
+    public addFunction(func: Function)
+    {
+        this._allTweens.push(
+            cc.tween()
+                .delay(0)
+                .call(() =>
+                {
+                    func();
+                    this.nextTween();
+                }));
+    }
+
     private nextTween()
     {
         if (this._tweenIndex + 1 >= this._allTweens.length)
@@ -91,6 +112,23 @@ export default class TweenSequence
                 .to(duration, { position: targetLocalPos }));
     }
 
+    private static playAudio(audioClip: cc.AudioClip, waitForEnd: boolean, base: TweenSequence): Function
+    {
+        return () =>
+        {
+            if (audioClip)
+            {
+                let audioId = cc.audioEngine.playEffect(audioClip, false);
+                if (waitForEnd)
+                    cc.audioEngine.setFinishCallback(audioId, base.nextTween);
+                else
+                    base.nextTween();
+            }
+            else
+                base.nextTween();
+        }
+    }
+
     public static wait(second: number): NTween
     {
         return new NTween(
@@ -127,7 +165,7 @@ export class NTween
         let sequence = new NTween();
         for (let i = 0; i < tweens.length; i++)
         {
-            let t= tweens[i];
+            let t = tweens[i];
             if (t instanceof NTween)
             {
                 //let t = tweens[i] as NTween;
@@ -136,17 +174,17 @@ export class NTween
                 else
                     sequence._allTweens.push(t.firstTween);
             }
-            else if(t instanceof cc.Tween)
+            else if (t instanceof cc.Tween)
             {
                 //let t = tweens[i] as cc.Tween<unknown>;
                 sequence._allTweens.push(t);
             }
-            else if(t instanceof Function)
+            else if (t instanceof Function)
             {
                 sequence._allTweens.push(
                     cc.tween()
-                    .delay(0)
-                    .call(t));
+                        .delay(0)
+                        .call(t));
             }
         }
         return sequence;

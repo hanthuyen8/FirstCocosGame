@@ -28,6 +28,11 @@ export default class LevelManager extends cc.Component
         this.hideAllLevels();
     }
 
+    start()
+    {
+        this.initAllLevelsId();
+    }
+
     public showLevel(index: number)
     {
         let hide = this.isLevelExist(this._currentLevelIndex);
@@ -84,6 +89,14 @@ export default class LevelManager extends cc.Component
         for (let i of this.levels)
         {
             i.hide();
+        }
+    }
+
+    private initAllLevelsId()
+    {
+        for (let i = 0; i < this.levels.length; i++)
+        {
+            this.levels[i].init(i);
         }
     }
 

@@ -13,6 +13,8 @@ import ButtonColor, { ButtonState } from "./HoverAndClick/ButtonColor";
 import PromiseHelper from "./PromiseHelper";
 import Assert from "./Assert";
 import TweenSequence, { NTween } from "./TweenSequence";
+import Chains from "./Chain";
+import AudioManager from "./AudioManager";
 
 const { ccclass, property } = cc._decorator;
 
@@ -21,9 +23,6 @@ export default class Demo extends cc.Component
 {
     @property(cc.Node)
     private title: cc.Node = null;
-
-    @property({ type: [AudioData] })
-    private allAudio: AudioData[] = [];
 
     @property([FadeInData])
     private willFadeIn: FadeInData[] = [];
@@ -55,8 +54,6 @@ export default class Demo extends cc.Component
     private _isFirstPlay: boolean;
     private _dragOriginalPos: cc.Vec2;
     private _titleOriginalPos: cc.Vec2;
-    private _audioIsPlaying: Map<number, boolean> = new Map();
-    private _cancelDemoPromiseHandler: Function;
 
     onLoad()
     {
@@ -80,131 +77,102 @@ export default class Demo extends cc.Component
         let moveMouseDownABit = cc.v2(0, -30);
         this.node.active = true;
 
-        let baseTween = new TweenSequence();
-        baseTween.addTween(
-            TweenSequence.wait(1),
-            TweenSequence.fadeIn(this.title, 1),
-            NTween.newParallel(
-                TweenSequence.wait(2.5),
-                TweenSequence.bouncing(this.title, 1.1, 1),
-                () => this.playAudio("title")),
-            TweenSequence.moveToPosition(this.title, 1, this._titleOriginalPos),
-
-
-
-        )
+        let audioManager = AudioManager.instance;
+        let chains = new Chains("Demo");
+        chains.add(
+            Chains.wait(chains, 1.5),
+            Chains.fadeIn(chains, this.title, 1),
+            Chains.parallel(
+                audioManager.chain("demo-title"),
+                Chains.bouncing(chains, this.title, 1.1, 1)
+            ),
+            Chains.wait(chains, 1.5),
+            Chains.moveToPosition(chains, this.title, 1, this._titleOriginalPos),
+            this.fadeInAllNodes(() => chains.done()),
+            Chains.parallel(
+                () => this.bubble.opacity = 255,
+                audioManager.chain("demo-how-to-play", () => chains.done())
+            ),
+            this.flashingItems("Item", 0.3, 4, () => chains.done()),
+            Chains.parallel(
+                () => this.cursor.opacity = 255,
+                Chains.moveToNode(chains, this.cursor, 0.7, this.drag, moveMouseDownABit)
+            ),
+            this.hoverDrag(chains, 2),
+            this.clickDrag(chains),
+            Chains.wait(chains, 1),
+            Chains.parallel(
+                Chains.moveToNode(null, this.cursor, 1, this.drop, moveMouseDownABit),
+                Chains.moveToNode(chains, this.drag, 1, this.drop)
+            ),
+            this.dropDrag(chains),
+            Chains.wait(chains, 0.5),
+            this.dragCorrect(chains),
+            Chains.wait(chains, 0.5),
+            Chains.moveToNode(chains, this.cursor, 1, this.stopButton, moveMouseDownABit),
+            Chains.parallel(
+                Chains.bouncing(chains, this.stopButton, 1.2, 4),
+                audioManager.chain("demo-x-icon")
+            ),
+            Chains.moveToNode(chains, this.cursor, 1, this.infoButton, moveMouseDownABit),
+            Chains.parallel(
+                Chains.bouncing(chains, this.infoButton, 1.2, 4),
+                audioManager.chain("demo-i-icon")
+            ),
+            Chains.moveToNode(chains, this.cursor, 1, this.playButton, moveMouseDownABit),
+            Chains.parallel(
+                Chains.bouncing(chains, this.playButton, 1.2, 4),
+                audioManager.chain(this._isFirstPlay ? "demo-start-btn" : "demo-resume-btn")
+            )
         );
-
-        let promiseHandler = PromiseHelper.newBasePromise();
-        this._cancelDemoPromiseHandler = promiseHandler.cancelHandler;
-
-        promiseHandler.promise
-            // Show Title
-            .then(() => PromiseHelper.wait(1))
-            .then(() => PromiseHelper.fadeIn(this.title, 1))
-            .then(() => PromiseHelper.runParallel(
-                PromiseHelper.wait(2.5),
-                () => PromiseHelper.bouncing(this.title, 1.1, 1),
-                () => this.playAudio("title")))
-            .then(() => PromiseHelper.moveToPosition(this.title, 1, this._titleOriginalPos))
-
-            // Show All Items And Buttons
-            .then(() => this.fadeInAllNodes())
-            .then(() => this.bubble.opacity = 255)
-            .then(() => this.playAudioCallback("how_to_play"))
-            .then(() => this.flashingItems("Item"))
-
-            // Show Cursor
-            .then(() => this.cursor.opacity = 255)
-            .then(() => PromiseHelper.moveToNodeCallback(this.cursor, .7, this.drag, moveMouseDownABit))
-            .then(() => this.hoverDrag(2))
-            .then(() => this.clickDrag())
-            .then(() => PromiseHelper.wait(1))
-            .then(() => PromiseHelper.runParallel(
-                PromiseHelper.moveToNodeCallback(this.cursor, 1, this.drop, moveMouseDownABit),
-                () => PromiseHelper.moveToNode(this.drag, 1, this.drop)))
-            .then(() => this.dropDrag())
-            .then(() => PromiseHelper.wait(0.5))
-            .then(() => this.dragCorrect())
-            .then(() => PromiseHelper.wait(0.5))
-            .then(() => PromiseHelper.moveToNodeCallback(this.cursor, 1, this.stopButton, moveMouseDownABit))
-            .then(() => PromiseHelper.runParallel(
-                PromiseHelper.bouncing(this.stopButton, 1.2, 4),
-                () => this.playAudio("stop_btn")))
-            .then(() => PromiseHelper.moveToNodeCallback(this.cursor, 1, this.infoButton, moveMouseDownABit))
-            .then(() => PromiseHelper.runParallel(
-                PromiseHelper.bouncing(this.infoButton, 1.2, 4),
-                () => this.playAudio("info_btn")))
-            .then(() => PromiseHelper.moveToNodeCallback(this.cursor, 1, this.playButton, moveMouseDownABit))
-            .then(() => PromiseHelper.runParallel(
-                PromiseHelper.bouncing(this.playButton, 1.2, 30),
-                () => this.playAudio(this._isFirstPlay ? "start_btn" : "resume_btn")));
+        chains.play();
     }
 
     public stop()
     {
-        if (this._cancelDemoPromiseHandler)
-            this._cancelDemoPromiseHandler("cancel");
-
         cc.Tween.stopAll();
-        this._audioIsPlaying.forEach((v, k) => cc.audioEngine.stopEffect(k));
-        this._audioIsPlaying.clear();
+        Chains.stop("Demo");
+        cc.audioEngine.stopAllEffects();
         this._isFirstPlay = false;
         this.node.active = false;
     }
-
-    private playAudio(audioName: string)
+/* 
+    private playAudio(chain: Chains, audioName: string, waitToEnd: boolean): Function
     {
-        if (!MouseInput.audioCanPlay)
+        return () =>
         {
-            cc.log("Audio cannot start: " + audioName);
-            return;
-        }
-
-        cc.log("Play audio: " + audioName);
-        let obj = this.allAudio.find(x => x.audioName === audioName);
-        if (obj)
-        {
-            let audioId = cc.audioEngine.playEffect(obj.audioClip, false);
-            this._audioIsPlaying.set(audioId, true);
-            cc.audioEngine.setFinishCallback(audioId, () => this._audioIsPlaying.delete(audioId));
-        }
-    }
-
-    private playAudioCallback(audioName: string): Promise<unknown>
-    {
-        return new Promise((resolve, reject) =>
-        {
-            if (!MouseInput.audioCanPlay)// || !this.node.activeInHierarchy)
+            if (!MouseInput.audioCanPlay)
             {
                 cc.log("Audio cannot start: " + audioName);
-                resolve();
-                return;
-            }
-
-            cc.log("Play audio: " + audioName);
-            let obj = this.allAudio.find(x => x.audioName === audioName);
-            if (obj)
-            {
-                let audioId = cc.audioEngine.playEffect(obj.audioClip, false);
-                cc.audioEngine.setFinishCallback(audioId, () => { this._audioIsPlaying.delete(audioId); resolve(); });
             }
             else
             {
-                reject("Audio not found: " + audioName);
+                cc.log("Play audio: " + audioName);
+                let obj = this.allAudio.find(x => x.audioName === audioName);
+                if (obj)
+                {
+                    let audioId = cc.audioEngine.playEffect(obj.audioClip, false);
+                    this._audioIsPlaying.set(audioId, true);
+                    cc.audioEngine.setFinishCallback(audioId, () =>
+                    {
+                        this._audioIsPlaying.delete(audioId)
+                        if (waitToEnd && chain)
+                        {
+                            chain.done();
+                            return;
+                        }
+                    });
+                }
             }
-        });
-    }
+            if (chain)
+                chain.done();
+        }
+    } */
 
-    private fadeInAllNodes(): Promise<unknown>
+    private fadeInAllNodes(callback: Function): Function
     {
-        return new Promise((resolve, reject) =>
+        return () =>
         {
-            /* if (!this.node.activeInHierarchy)
-            {
-                reject("Promise cancel");
-                return;
-            } */
             let index = 0;
             for (let i = 0; i < this.willFadeIn.length - 1; i++)
             {
@@ -220,24 +188,19 @@ export default class Demo extends cc.Component
             cc.tween(last.anyNode)
                 .delay(index * (last.fadeSpeed + this.waitTimeBetweenNode))
                 .to(last.fadeSpeed, { opacity: 255 })
-                .call(resolve)
+                .call(callback)
                 .start();
-        });
+        }
     }
 
-    private flashingItems(ofGroup: string, fadeSpeed: number = 0.3, repeat: number = 2)
+    private flashingItems(ofGroup: string, fadeSpeed: number = 0.3, repeat: number = 2, callback: Function): Function
     {
-        return new Promise((resolve, reject) =>
+        return () =>
         {
-            /* if (!this.node.activeInHierarchy)
-            {
-                reject("Promise cancel");
-                return;
-            } */
             let items = this.willFadeIn.filter(x => x.anyNode.group === ofGroup);
             if (items.length == 0)
             {
-                reject("No " + ofGroup + " group found");
+                callback();
                 return;
             }
 
@@ -259,61 +222,78 @@ export default class Demo extends cc.Component
                 else
                 {
                     // detect last item
-                    setTimeout(() => sampleTween.clone(thatNode).call(resolve).start(), waitTime * 1000);
+                    setTimeout(() => sampleTween.clone(thatNode).call(callback).start(), waitTime * 1000);
                 }
                 index++;
             }
-        });
+        }
     }
 
     //#region Drag Effect
-    private clickDrag()
+    private clickDrag(chain: Chains): Function
     {
-        this.playAudio("click");
-        let hover = this.drag.getComponent(HoverEffect);
-        if (hover)
+        return () =>
         {
-            hover.startClickEffect();
+            AudioManager.instance.play("click");
+            let hover = this.drag.getComponent(HoverEffect);
+            if (hover)
+            {
+                hover.startClickEffect();
+            }
+            if (chain)
+                chain.done();
         }
     }
 
-    private dropDrag()
+    private dropDrag(chain: Chains): Function
     {
-        this.playAudio("drop");
-        let hover = this.drag.getComponent(HoverEffect);
-        if (hover)
+        return () =>
         {
-            hover.stopClickEffect(null);
+            AudioManager.instance.play("drop");
+            let hover = this.drag.getComponent(HoverEffect);
+            if (hover)
+            {
+                hover.stopClickEffect(null);
+            }
+            if (chain)
+                chain.done();
         }
     }
 
-    private dragCorrect()
+    private dragCorrect(chain: Chains): Function
     {
-        this.playAudio("correct");
-        let buttonState = this.drag.getComponent(ButtonColor);
-        if (buttonState)
+        return () =>
         {
-            buttonState.ChangeState(ButtonState.Correct);
+            AudioManager.instance.play("answer-correct");
+            let buttonState = this.drag.getComponent(ButtonColor);
+            if (buttonState)
+            {
+                buttonState.ChangeState(ButtonState.Correct);
+            }
+            if (chain)
+                chain.done();
         }
     }
 
-    private hoverDrag(durationInSec: number): Promise<unknown>
+    private hoverDrag(chain: Chains, inSecond: number): Function
     {
-        return new Promise((resolve, reject) =>
+        return () =>
         {
             let hover = this.drag.getComponent(HoverEffect);
             if (!hover)
             {
-                reject("Không tìm thấy component HoverEffect");
+                if (chain)
+                    chain.done();
                 return;
             }
             hover.startHoverEffect();
             setTimeout(() =>
             {
                 hover.stopHoverEffect();
-                resolve();
-            }, durationInSec * 1000);
-        });
+                if (chain)
+                    chain.done();
+            }, inSecond * 1000);
+        }
     }
 
     private resetDrag()
