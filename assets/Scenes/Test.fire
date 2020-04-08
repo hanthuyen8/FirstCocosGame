@@ -75,22 +75,19 @@
         "__id__": 5
       },
       {
-        "__id__": 7
+        "__id__": 8
       },
       {
-        "__id__": 9
+        "__id__": 10
       }
     ],
     "_active": true,
     "_components": [
       {
-        "__id__": 11
-      },
-      {
-        "__id__": 12
-      },
-      {
         "__id__": 13
+      },
+      {
+        "__id__": 14
       }
     ],
     "_prefab": null,
@@ -251,6 +248,9 @@
     "_components": [
       {
         "__id__": 6
+      },
+      {
+        "__id__": 7
       }
     ],
     "_prefab": null,
@@ -334,6 +334,17 @@
     "_id": "fcHsMqA0JDuLylGtc0ms9b"
   },
   {
+    "__type__": "7e7798nmMdMq7qagKOUNxtQ",
+    "_name": "",
+    "_objFlags": 0,
+    "node": {
+      "__id__": 5
+    },
+    "_enabled": true,
+    "acceptedDragId": "",
+    "_id": "81q7Zbb0BBea6SCEcj5r9q"
+  },
+  {
     "__type__": "cc.Node",
     "_name": "btn stop",
     "_objFlags": 0,
@@ -344,7 +355,7 @@
     "_active": true,
     "_components": [
       {
-        "__id__": 8
+        "__id__": 9
       }
     ],
     "_prefab": null,
@@ -400,7 +411,7 @@
     "_name": "",
     "_objFlags": 0,
     "node": {
-      "__id__": 7
+      "__id__": 8
     },
     "_enabled": true,
     "_materials": [
@@ -438,7 +449,10 @@
     "_active": true,
     "_components": [
       {
-        "__id__": 10
+        "__id__": 11
+      },
+      {
+        "__id__": 12
       }
     ],
     "_prefab": null,
@@ -494,7 +508,7 @@
     "_name": "",
     "_objFlags": 0,
     "node": {
-      "__id__": 9
+      "__id__": 10
     },
     "_enabled": true,
     "_materials": [
@@ -520,6 +534,20 @@
     "_isTrimmedMode": true,
     "_atlas": null,
     "_id": "45MNK2HcFPVIYP0r0VWREI"
+  },
+  {
+    "__type__": "ed5eeitKdtOGLdCqEeXWQYj",
+    "_name": "",
+    "_objFlags": 0,
+    "node": {
+      "__id__": 10
+    },
+    "_enabled": true,
+    "acceptRaycast": true,
+    "dragId": "",
+    "clickSound": null,
+    "dropSound": null,
+    "_id": "71EJ5A1PBDSoZ/iBRntmlb"
   },
   {
     "__type__": "cc.Canvas",
@@ -564,24 +592,5 @@
     "_originalWidth": 0,
     "_originalHeight": 0,
     "_id": "29zXboiXFBKoIV4PQ2liTe"
-  },
-  {
-    "__type__": "f632emTMpBLe5AvhFtc3a8M",
-    "_name": "",
-    "_objFlags": 0,
-    "node": {
-      "__id__": 2
-    },
-    "_enabled": true,
-    "node1": {
-      "__id__": 5
-    },
-    "node2": {
-      "__id__": 7
-    },
-    "node3": {
-      "__id__": 9
-    },
-    "_id": "f2y8KRZyBFB4BllvEIopSS"
   }
 ]

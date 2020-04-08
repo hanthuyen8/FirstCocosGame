@@ -12,6 +12,8 @@ import Assert from "./Assert";
 import LevelManager from "./Levels/LevelManager";
 import Level from "./Levels/Level";
 import Demo from "./Demo";
+import Helper from "./Helper";
+import Drag from "./DragAndDrop/Drag";
 
 const { ccclass, property } = cc._decorator;
 
@@ -40,7 +42,7 @@ export default class GameController extends cc.Component
         Assert.isNotNull(this.correctSound);
         Assert.isNotNull(this.incorrectSound);
 
-        this.node.on(Drop.ON_DROP_EVENT, this.onSomethingDropped, this);
+        cc.systemEvent.on(Drop.ON_DROP_EVENT, this.onSomethingDropped, this);
         this.node.on(LevelManager.LEVEL_CHANGE_EVENT, this.onLevelChanged, this);
     }
 
@@ -51,7 +53,8 @@ export default class GameController extends cc.Component
 
     onDestroy()
     {
-        this.node.off(Drop.ON_DROP_EVENT, this.onSomethingDropped, this);
+        cc.systemEvent.off(Drop.ON_DROP_EVENT, this.onSomethingDropped, this);
+        this.node.off(LevelManager.LEVEL_CHANGE_EVENT, this.onLevelChanged, this);
     }
 
     public startToPlay()
@@ -85,15 +88,15 @@ export default class GameController extends cc.Component
 
     private onSomethingDropped(eventArg: DropResult)
     {
+        this.levelManager.currentLevel.disableInteractables();
         let drag = eventArg.drag;
-        let drop = eventArg.drop.node;
-        let dropWorldPos = drop.parent.convertToWorldSpaceAR(drop.getPosition());
-        let dropLocalPos = drag.node.parent.convertToNodeSpaceAR(dropWorldPos);
-        drag.node.setPosition(dropLocalPos);
+        let dragNode = drag.node;
+        let dropNode = eventArg.drop.node;
+        let dropLocalPos = Helper.convertToSameSpace_node(dragNode, dropNode);
+        drag.keepPositionAt(dropLocalPos);
+        drag.interactable = false;
 
-        setTimeout(validating, 1);
-
-        function validating()
+        let validating = () =>
         {
             if (eventArg.result === true)
             {
@@ -105,12 +108,19 @@ export default class GameController extends cc.Component
             {
                 // Kết quả Drop là sai
                 drag.getComponent(ButtonColor).ChangeState(ButtonState.Incorrect);
-                drag.interactable = false;
                 cc.audioEngine.playEffect(this.incorrectSound, false);
-                setTimeout(() => drag.restorePosition(), 1);
+
+                setTimeout(() =>
+                {
+                    drag.restorePosition();
+                    this.levelManager.currentLevel.enableInteractables();
+                    drag.interactable = false;
+                }, 1000);
             }
-            this.calculateScore();
+            this.calculateScore(eventArg.result);
         }
+
+        setTimeout(() => validating(), 1000);
     }
 
     private _answerTime: number = 0;

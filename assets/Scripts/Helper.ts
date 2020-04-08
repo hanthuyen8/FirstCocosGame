@@ -11,4 +11,15 @@ export default class Helper
     {
         return (Math.random() * (max - min)) + min;
     }
+
+    public static convertToSameSpace(base: cc.Node, target: cc.Node, targetPosition : cc.Vec2) : cc.Vec2
+    {
+        let targetWorldPos = target.parent.convertToWorldSpaceAR(targetPosition);
+        return base.parent.convertToNodeSpaceAR(targetWorldPos);
+    }
+
+    public static convertToSameSpace_node(base: cc.Node, target: cc.Node) : cc.Vec2
+    {
+        return Helper.convertToSameSpace(base, target, target.getPosition());
+    }
 }

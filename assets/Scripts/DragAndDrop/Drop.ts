@@ -8,6 +8,7 @@
 import Drag from "./Drag";
 import DropResult from "./DropResult";
 import Assert from "../Assert";
+import Helper from "../Helper";
 
 const { ccclass, property } = cc._decorator;
 
@@ -19,52 +20,36 @@ export default class Drop extends cc.Component
 
     public static readonly ON_DROP_EVENT = "ON_DROP_EVENT";
 
-    private _lastDetectedDrag: Drag;
-
     onLoad()
     {
-        this.node.on(cc.Node.EventType.MOUSE_UP, this.onDrop, this);
-        this.node.on(cc.Node.EventType.MOUSE_ENTER, this.onMouseEnter, this);
-        this.node.on(cc.Node.EventType.MOUSE_LEAVE, this.onMouseLeave, this);
-
         this.acceptedDragId = this.acceptedDragId.trim();
     }
 
-    onDestroy()
+    onEnable()
     {
-        this.node.off(cc.Node.EventType.MOUSE_UP, this.onDrop, this);
-        this.node.off(cc.Node.EventType.MOUSE_ENTER, this.onMouseEnter, this);
-        this.node.off(cc.Node.EventType.MOUSE_LEAVE, this.onMouseLeave, this);
+        cc.systemEvent.on(Drag.DRAG_RELEASE_EVENT, this.onDrop, this);
     }
 
-    private onMouseEnter()
+    onDisable()
     {
-        this._lastDetectedDrag = Drag.beingDrag;
+        cc.systemEvent.off(Drag.DRAG_RELEASE_EVENT, this.onDrop, this);
     }
 
-    private onMouseLeave()
+    private onDrop(drag: Drag, pos: cc.Vec2)
     {
-        this._lastDetectedDrag = null;
-    }
+        let localDragPos = Helper.convertToSameSpace(this.node, drag.node, pos);
+        if (!this.node.getBoundingBox().contains(localDragPos))
+            return;
 
-    private onDrop()
-    {
-        if (this._lastDetectedDrag)
+        let result: boolean = false;
+        if (this.acceptedDragId == "" || this.acceptedDragId == drag.id)
         {
-            let result: boolean = false;
-            if (this.acceptedDragId == "")
-            {
-                // Nhận mọi DragId
-                result = true;
-            }
-            else if(this.acceptedDragId == this._lastDetectedDrag.id)
-            {
-                // Chỉ nhận DragId nào trùng với acceptedDragId
-                result = true;
-            }
-            cc.log(result);
-            cc.systemEvent.emit(Drop.ON_DROP_EVENT, new DropResult(result, this._lastDetectedDrag, this));
+            // Nhận mọi DragId nếu acceptedDragId = ""
+            // Chỉ nhận DragId nào trùng với acceptedDragId
+            result = true;
         }
+        cc.log(result);
+        cc.systemEvent.emit(Drop.ON_DROP_EVENT, new DropResult(result, drag, this));
     }
 
 }

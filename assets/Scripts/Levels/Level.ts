@@ -9,6 +9,7 @@ import FadeInData from "../FadeInData";
 import Assert from "../Assert";
 import { IInteractable, InteractableHelper } from "../Interfaces/IInteractable";
 import Chains from "../Chain";
+import Interactable from "../Interfaces/Interactable";
 
 const { ccclass, property } = cc._decorator;
 
@@ -18,13 +19,10 @@ export default class Level extends cc.Component
     @property([FadeInData])
     private willFadeIn: FadeInData[] = []
 
-    @property([cc.Node])
-    private allInteractables: cc.Node[] = [];
-
     @property
     private waitTimeBetweenNode = 0.7;
 
-    private _allInteractables: IInteractable[] = [];
+    private _allInteractables: Interactable[] = [];
 
     private _isLevelLoaded = false;
     private _id: number;
@@ -32,7 +30,6 @@ export default class Level extends cc.Component
     onLoad()
     {
         Assert.isNotEmpty(this.willFadeIn);
-        Assert.isNotEmpty(this.allInteractables);
         this.generatingData();
     }
 
@@ -68,7 +65,7 @@ export default class Level extends cc.Component
             return;
 
         this.willFadeIn = FadeInData.regenerateNewFadeIn(this.willFadeIn);
-        this._allInteractables = InteractableHelper.getIInteractableFromNodes(this.allInteractables);
+        this._allInteractables = this.node.getComponentsInChildren(Interactable);
         this._isLevelLoaded = true;
     }
 

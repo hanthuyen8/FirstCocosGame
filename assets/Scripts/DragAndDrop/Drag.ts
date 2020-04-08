@@ -5,16 +5,13 @@
 // Learn life-cycle callbacks:
 //  - https://docs.cocos.com/creator/manual/en/scripting/life-cycle-callbacks.html
 
-import MouseInput from "./MouseInput";
+import Interactable from "../Interfaces/Interactable";
 
 const { ccclass, property } = cc._decorator;
 
 @ccclass
-export default class Drag extends cc.Component implements IInteractable
+export default class Drag extends Interactable
 {
-    @property({ displayName: "Interactable" })
-    private acceptRaycast = true;
-
     @property()
     private dragId: string = "";
 
@@ -25,46 +22,52 @@ export default class Drag extends cc.Component implements IInteractable
     private dropSound: cc.AudioClip = null;
 
     // Other Variables
-
+    public static readonly DRAG_RELEASE_EVENT = "DRAG_RELEASE_EVENT";
     public static beingDrag: Drag;
 
     get id(): string { return this.dragId; }
 
-    get interactable(): boolean { return this.acceptRaycast; }
-
-    set interactable(value: boolean)
-    {
-        this.acceptRaycast = value;
-        if (value)
-            this.subscribeInputEvents();
-        else
-            this.unsubscribeInputEvents();
-    }
-
     private _originalPosition: cc.Vec2;
-    private _isDragging: boolean;
+    private _keepPosition: boolean;
 
     onLoad()
     {
         this._originalPosition = this.node.getPosition();
-        this.subscribeInputEvents();
-    }
-
-    onDestroy()
-    {
-        this.unsubscribeInputEvents();
     }
 
     public restorePosition()
     {
+        this._keepPosition = false;
         this.node.setPosition(this._originalPosition);
+    }
+
+    public keepPositionAt(pos: cc.Vec2)
+    {
+        this._keepPosition = true;
+        this.node.setPosition(pos);
+    }
+
+    protected subscribeInputEvents()
+    {
+        this.unsubscribeInputEvents();
+        this.node.on(cc.Node.EventType.TOUCH_START, this.onBeginDrag, this);
+        this.node.on(cc.Node.EventType.TOUCH_END, this.onEndDrag, this);
+    }
+
+    protected unsubscribeInputEvents()
+    {
+        this.node.off(cc.Node.EventType.TOUCH_START, this.onBeginDrag, this);
+        this.node.off(cc.Node.EventType.TOUCH_END, this.onEndDrag, this);
     }
 
     private onBeginDrag()
     {
-        this._isDragging = true;
-        this.node.on(cc.Node.EventType.TOUCH_MOVE, this.onDrag, this);
+        if (Drag.beingDrag)
+            return;
+
         Drag.beingDrag = this;
+        this.node.setSiblingIndex(99);
+        this.node.on(cc.Node.EventType.TOUCH_MOVE, this.onDrag, this);
 
         if (this.clickSound)
         {
@@ -72,44 +75,26 @@ export default class Drag extends cc.Component implements IInteractable
         }
     }
 
-    private onDrag()
+    private onDrag(event: cc.Event.EventTouch)
     {
-        if (!this._isDragging)
-            return;
-
-        var newPosition = this.node.parent.convertToNodeSpaceAR(MouseInput.position);
+        var newPosition = this.node.parent.convertToNodeSpaceAR(event.getLocation());
         this.node.setPosition(newPosition);
     }
 
     private onEndDrag()
     {
-        this._isDragging = false;
-        this.node.off(cc.Node.EventType.TOUCH_MOVE, this.onDrag, this);
         Drag.beingDrag = null;
+        this.node.setSiblingIndex(0);
+        this.node.off(cc.Node.EventType.TOUCH_MOVE, this.onDrag, this);
 
-        this.node.setPosition(this._originalPosition);
+        cc.systemEvent.emit(Drag.DRAG_RELEASE_EVENT, this, this.node.getPosition());
+
+        if (!this._keepPosition)
+            this.restorePosition();
 
         if (this.dropSound)
         {
             cc.audioEngine.playEffect(this.dropSound, false);
         }
-    }
-
-    private subscribeInputEvents()
-    {
-        if (!this.acceptRaycast)
-            return;
-
-        this.node.on(cc.Node.EventType.TOUCH_START, this.onBeginDrag, this);
-        this.node.on(cc.Node.EventType.TOUCH_END, this.onEndDrag, this);
-    }
-
-    private unsubscribeInputEvents()
-    {
-        if (!this.acceptRaycast)
-            return;
-
-        this.node.off(cc.Node.EventType.TOUCH_START, this.onBeginDrag, this);
-        this.node.off(cc.Node.EventType.TOUCH_END, this.onEndDrag, this);
     }
 }

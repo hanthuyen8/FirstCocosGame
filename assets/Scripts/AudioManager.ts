@@ -45,7 +45,6 @@ export default class AudioManager extends cc.Component
 
         for (let i of this.data)
         {
-            cc.log(i.audioClip.name);
             if (this._dataDict.has(i.audioName))
             {
                 throw new Error("Không được phép có audio trùng id: " + i.audioName);

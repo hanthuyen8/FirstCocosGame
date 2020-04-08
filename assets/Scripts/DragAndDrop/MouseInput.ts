@@ -12,19 +12,13 @@ export default class MouseInput extends cc.Component
 {
     //public static readonly MOUSE_UP_EVENT = "MOUSE_UP_EVENT";
     public static position: cc.Vec2;
-    
-    public static get audioCanPlay(): boolean
-    {
-        return MouseInput._audioCanPlay;
-    }
 
-    private static _audioCanPlay = false;
     private static _canvas : cc.Node;
 
     onLoad()
     {
+        cc.macro.ENABLE_MULTI_TOUCH = false;
         MouseInput._canvas = cc.Canvas.instance.node;
-        MouseInput._canvas.once(cc.Node.EventType.MOUSE_DOWN, () => MouseInput._audioCanPlay = true);
         MouseInput._canvas.on(cc.Node.EventType.MOUSE_MOVE, this.onMouseMove, this);
     }
 
