@@ -6,13 +6,9 @@
 //  - https://docs.cocos.com/creator/manual/en/scripting/life-cycle-callbacks.html
 
 import FadeInData from "./FadeInData";
-import AudioData from "./AudioData";
-import MouseInput from "./DragAndDrop/MouseInput";
 import HoverEffect from "./HoverAndClick/HoverEffect";
 import ButtonColor, { ButtonState } from "./HoverAndClick/ButtonColor";
-import PromiseHelper from "./PromiseHelper";
 import Assert from "./Assert";
-import TweenSequence, { NTween } from "./TweenSequence";
 import Chains from "./Chain";
 import AudioManager from "./AudioManager";
 
@@ -78,7 +74,8 @@ export default class Demo extends cc.Component
         this.node.active = true;
 
         let audioManager = AudioManager.instance;
-        let chains = new Chains("Demo");
+
+        let chains =  new Chains("Demo");
         chains.add(
             Chains.wait(chains, 1.5),
             Chains.fadeIn(chains, this.title, 1),

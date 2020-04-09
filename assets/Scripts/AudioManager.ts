@@ -23,24 +23,18 @@ export default class AudioManager extends cc.Component
     @property({ type: [AudioData] })
     public data: AudioData[] = []
 
-    private _dataDict: Map<string, AudioMeta> = new Map;
-
     private static _instance: AudioManager = null;
+
+    private _dataDict: Map<string, AudioMeta> = new Map;
 
     onLoad()
     {
         /*         if (this.node !== cc.Canvas.instance.node)
                     throw new Error("Component này phải ngang cấp với Canvas cao nhất");
                  */
-        if (AudioManager._instance == null || AudioManager._instance == undefined)
-        {
-            AudioManager._instance = this;
-        }
-        else
-        {
-            this.destroy();
+        if (this.isSingletonAlreadyLoaded())
             return;
-        }
+        
         cc.Canvas.instance.node.once(cc.Node.EventType.MOUSE_DOWN, () => cc.audioEngine.stopAllEffects());
 
         for (let i of this.data)
@@ -96,6 +90,31 @@ export default class AudioManager extends cc.Component
                 cc.audioEngine.stopEffect(data.playId);
                 data.reset();
             }
+        }
+    }
+
+    public toggleBackgroundMusic(toggle : cc.Toggle)
+    {
+        if (this.backgroundMusic)
+        {
+            if (toggle.isChecked)
+                cc.audioEngine.resumeMusic();
+            else
+                cc.audioEngine.pauseMusic();
+        }
+    }
+
+    private isSingletonAlreadyLoaded() : boolean
+    {
+        if (AudioManager._instance == null || AudioManager._instance == undefined)
+        {
+            AudioManager._instance = this;
+            return false;
+        }
+        else
+        {
+            this.destroy();
+            return true
         }
     }
 }

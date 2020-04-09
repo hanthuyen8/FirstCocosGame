@@ -7,7 +7,6 @@
 
 import FadeInData from "../FadeInData";
 import Assert from "../Assert";
-import { IInteractable, InteractableHelper } from "../Interfaces/IInteractable";
 import Chains from "../Chain";
 import Interactable from "../Interfaces/Interactable";
 
@@ -43,7 +42,7 @@ export default class Level extends cc.Component
         this.resetLevel();
         this.node.active = true;
 
-        let chains = new Chains("Level " + this._id);
+        let chains = new Chains("Level" + this._id);
         for (let i of this.willFadeIn)
         {
             chains.add(
@@ -56,6 +55,7 @@ export default class Level extends cc.Component
 
     public hide()
     {
+        Chains.stop("Level" + this._id);
         this.node.active = false;
     }
 

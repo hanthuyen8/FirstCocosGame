@@ -5,9 +5,6 @@
 // Learn life-cycle callbacks:
 //  - https://docs.cocos.com/creator/manual/en/scripting/life-cycle-callbacks.html
 
-const { ccclass } = cc._decorator;
-
-@ccclass
 export default class Chains
 {
     private static _allActiveChains: Map<string, Chains> = new Map;
@@ -19,7 +16,8 @@ export default class Chains
     {
         if (Chains._allActiveChains.has(id))
             throw new Error("Chains này đã tồn tại.");
-
+        
+        this._id = id;
         Chains._allActiveChains.set(id, this);
     }
 
@@ -55,7 +53,6 @@ export default class Chains
         Chains._allActiveChains.delete(this._id);
     }
 
-    // STATIC
     public static stop(id: string)
     {
         if (Chains._allActiveChains.has(id))
@@ -65,6 +62,7 @@ export default class Chains
         }
     }
 
+    // Helper
     public static bouncing(base: Chains, node: cc.Node, scaleRate: number, repeat: number): Function
     {
         repeat = Math.max(1, repeat);

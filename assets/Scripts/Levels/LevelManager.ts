@@ -81,7 +81,7 @@ export default class LevelManager extends cc.Component
             hideThat.hide();
         }
         showThat.show();
-        this.node.emit(LevelManager.LEVEL_CHANGE_EVENT, this._currentLevelIndex)
+        cc.systemEvent.emit(LevelManager.LEVEL_CHANGE_EVENT, this._currentLevelIndex)
     }
 
     private hideAllLevels()

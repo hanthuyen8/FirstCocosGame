@@ -7,7 +7,6 @@
 
 import Drag from "./Drag";
 import DropResult from "./DropResult";
-import Assert from "../Assert";
 import Helper from "../Helper";
 
 const { ccclass, property } = cc._decorator;

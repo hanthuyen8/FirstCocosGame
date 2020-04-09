@@ -1,9 +1,9 @@
 export default class Assert
 {
-    public static isNotNull(obj: any): boolean
+    public static isNotNull(obj: any, message : string = null): boolean
     {
         if (obj == null)
-            throw new Error("Object is null");
+            throw new Error(message ? message : "Object is null");
         return true;
     }
     public static isNotEmpty(obj: any[]): boolean

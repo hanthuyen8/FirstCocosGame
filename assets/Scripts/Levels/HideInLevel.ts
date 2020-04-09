@@ -5,21 +5,23 @@
 // Learn life-cycle callbacks:
 //  - https://docs.cocos.com/creator/manual/en/scripting/life-cycle-callbacks.html
 
-import Interactable from "./Interactable";
+import LevelManager from "./LevelManager";
 
 const {ccclass, property} = cc._decorator;
 
 @ccclass
-export default class Sample extends Interactable
-{
+export default class HideInLevel extends cc.Component {
+
+    @property()
+    private levelIds: string[] = []
     
-    subscribeInputEvents(): void
+    onLoad()
     {
-        throw new Error("Method not implemented.");
-    }
-    unsubscribeInputEvents(): void
-    {
-        throw new Error("Method not implemented.");
+        //cc.systemEvent.on(LevelManager.LEVEL_CHANGE_EVENT);
     }
 
+    onDestroy()
+    {
+
+    }
 }

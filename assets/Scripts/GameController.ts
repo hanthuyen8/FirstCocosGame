@@ -10,40 +10,51 @@ import DropResult from "./DragAndDrop/DropResult";
 import ButtonColor, { ButtonState } from "./HoverAndClick/ButtonColor";
 import Assert from "./Assert";
 import LevelManager from "./Levels/LevelManager";
-import Level from "./Levels/Level";
 import Demo from "./Demo";
 import Helper from "./Helper";
 import Drag from "./DragAndDrop/Drag";
+import AudioManager from "./AudioManager";
+import ChangeableSprite from "./ChangeableSprite";
+import ScoreDisplay from "./ScoreDisplay";
 
 const { ccclass, property } = cc._decorator;
 
 @ccclass
 export default class GameController extends cc.Component
 {
+    public static get instance(): GameController { return this._instance; }
+
     @property(LevelManager)
     private levelManager: LevelManager = null;
 
     @property(Demo)
     private demo: Demo = null;
 
-    @property({ type: cc.AudioClip })
-    private correctSound: cc.AudioClip = null;
+    @property(ScoreDisplay)
+    private scoreDisplay: ScoreDisplay = null;
 
-    @property({ type: cc.AudioClip })
-    private incorrectSound: cc.AudioClip = null;
+    @property(ChangeableSprite)
+    private janiceBubbleSpeech: ChangeableSprite = null;
 
     public get score(): number { return this._score; }
+
+    private static _instance: GameController = null;
     private _score: number = 0;
+    private _dragsInCurrentLevel: Drag[] = [];
+    private _answeredCountInCurrentLevel: number = 0;
 
     onLoad()
     {
+        if (this.isSingletonAlreadyLoaded())
+            return;
+        
         Assert.isNotNull(this.levelManager);
         Assert.isNotNull(this.demo);
-        Assert.isNotNull(this.correctSound);
-        Assert.isNotNull(this.incorrectSound);
+        Assert.isNotNull(this.scoreDisplay);
+        Assert.isNotNull(this.janiceBubbleSpeech);
 
         cc.systemEvent.on(Drop.ON_DROP_EVENT, this.onSomethingDropped, this);
-        this.node.on(LevelManager.LEVEL_CHANGE_EVENT, this.onLevelChanged, this);
+        cc.systemEvent.on(LevelManager.LEVEL_CHANGE_EVENT, this.onLevelChanged, this);
     }
 
     start()
@@ -54,9 +65,9 @@ export default class GameController extends cc.Component
     onDestroy()
     {
         cc.systemEvent.off(Drop.ON_DROP_EVENT, this.onSomethingDropped, this);
-        this.node.off(LevelManager.LEVEL_CHANGE_EVENT, this.onLevelChanged, this);
+        cc.systemEvent.off(LevelManager.LEVEL_CHANGE_EVENT, this.onLevelChanged, this);
     }
-
+    //#region Menu
     public startToPlay()
     {
         this.resumePlay();
@@ -65,7 +76,8 @@ export default class GameController extends cc.Component
 
     public resumePlay()
     {
-        this.demo.stop();
+        this.hideDemo();
+        this.hideScore();
         this.levelManager.node.active = true;
     }
 
@@ -78,12 +90,34 @@ export default class GameController extends cc.Component
     public showDemo()
     {
         this.levelManager.node.active = false;
+        this.hideScore();
         this.demo.play();
     }
 
+    public showScore()
+    {
+        this.levelManager.node.active = false;
+        this.hideDemo();
+        this.scoreDisplay.node.active = true;
+    }
+
+    private hideDemo()
+    {
+        this.demo.stop();
+    }
+
+    private hideScore()
+    {
+        this.scoreDisplay.node.active = false;
+    }
+    //#endregion
+
     private onLevelChanged(levelIndex: number)
     {
-        this.resetAnswerTime();
+        // reset values
+        this._dragsInCurrentLevel = [];
+        this._answeredCountInCurrentLevel = 0;
+        this.janiceBubbleSpeech.hide();
     }
 
     private onSomethingDropped(eventArg: DropResult)
@@ -94,7 +128,8 @@ export default class GameController extends cc.Component
         let dropNode = eventArg.drop.node;
         let dropLocalPos = Helper.convertToSameSpace_node(dragNode, dropNode);
         drag.keepPositionAt(dropLocalPos);
-        drag.interactable = false;
+
+        this._dragsInCurrentLevel.push(drag);
 
         let validating = () =>
         {
@@ -102,48 +137,77 @@ export default class GameController extends cc.Component
             {
                 // Kết quả Drop là chính xác
                 drag.getComponent(ButtonColor).ChangeState(ButtonState.Correct);
-                cc.audioEngine.playEffect(this.correctSound, false);
+                AudioManager.instance.play("answer-correct");
+                this._score++;
+                this.showJaniceBubble(1, true, 0);
             }
             else
             {
                 // Kết quả Drop là sai
                 drag.getComponent(ButtonColor).ChangeState(ButtonState.Incorrect);
-                cc.audioEngine.playEffect(this.incorrectSound, false);
+                AudioManager.instance.play("answer-incorrect");
 
                 setTimeout(() =>
                 {
                     drag.restorePosition();
-                    this.levelManager.currentLevel.enableInteractables();
-                    drag.interactable = false;
+                    this.givePlayerAnotherChanceOrNot();
+                    this.showJaniceBubble(1, false, this._answeredCountInCurrentLevel);
                 }, 1000);
             }
-            this.calculateScore(eventArg.result);
-        }
+        };
 
         setTimeout(() => validating(), 1000);
     }
 
-    private _answerTime: number = 0;
-
-    private resetAnswerTime()
+    private givePlayerAnotherChanceOrNot()
     {
-        this._answerTime = 0;
+        if (++this._answeredCountInCurrentLevel < 2)
+        {
+            // Give Player 1 more chance
+            this.levelManager.currentLevel.enableInteractables();
+            this._dragsInCurrentLevel.forEach(x => x.interactable = false);
+        }
     }
 
-    private calculateScore(howAnswer: boolean)
+    private static readonly _status_wellDone = "well-done";
+    private static readonly _status_tryAgain = "try-again";
+    private static readonly _status_notQuite = "not-quite";
+    private showJaniceBubble(afterXSecond: number, howAnswer: boolean, howManyTimePlayerWrong: number)
     {
-        if (howAnswer)
+        let showBubble = () =>
         {
-            // Player win this level
-            this.levelManager.currentLevel.disableInteractables();
-            this._score++;
-        }
-        else if (++this._answerTime >= 2)
-        {
-            // Player lose this Level, not allow to answer again
-            this.levelManager.currentLevel.disableInteractables();
-        }
+            if (howAnswer)
+            {
+                this.janiceBubbleSpeech.show(GameController._status_wellDone);
+                AudioManager.instance.play(GameController._status_wellDone);
+            }
+            else if (howManyTimePlayerWrong == 1)
+            {
+                this.janiceBubbleSpeech.show(GameController._status_tryAgain);
+                AudioManager.instance.play(GameController._status_tryAgain);
+            }
+            else
+            {
+                this.janiceBubbleSpeech.show(GameController._status_notQuite);
+                AudioManager.instance.play(GameController._status_notQuite);
+            }
+        };
 
+        setTimeout(() => showBubble(), afterXSecond * 1000);
+    }
+
+    private isSingletonAlreadyLoaded(): boolean
+    {
+        if (GameController._instance == null || GameController._instance == undefined)
+        {
+            GameController._instance = this;
+            return false;
+        }
+        else
+        {
+            this.destroy();
+            return true
+        }
     }
 }
 

@@ -6,6 +6,8 @@
 //  - https://docs.cocos.com/creator/manual/en/scripting/life-cycle-callbacks.html
 
 import Interactable from "../Interfaces/Interactable";
+import DropResult from "./DropResult";
+import Drop from "./Drop";
 
 const { ccclass, property } = cc._decorator;
 
@@ -25,14 +27,25 @@ export default class Drag extends Interactable
     public static readonly DRAG_RELEASE_EVENT = "DRAG_RELEASE_EVENT";
     public static beingDrag: Drag;
 
-    get id(): string { return this.dragId; }
+    public get id(): string { return this.dragId; }
+    public get dragCount(): number { return this._dragCount; }
+    public get dropCount(): number { return this._dropCount; }
 
     private _originalPosition: cc.Vec2;
     private _keepPosition: boolean;
+    private _dragCount = 0;
+    private _dropCount = 0;
 
     onLoad()
     {
         this._originalPosition = this.node.getPosition();
+    }
+
+    public reset()
+    {
+        this.restorePosition();
+        this._dragCount = 0;
+        this._dropCount = 0;
     }
 
     public restorePosition()
@@ -52,12 +65,22 @@ export default class Drag extends Interactable
         this.unsubscribeInputEvents();
         this.node.on(cc.Node.EventType.TOUCH_START, this.onBeginDrag, this);
         this.node.on(cc.Node.EventType.TOUCH_END, this.onEndDrag, this);
+        cc.systemEvent.on(Drop.ON_DROP_EVENT, this.onReceiveDropResult, this);
     }
 
     protected unsubscribeInputEvents()
     {
         this.node.off(cc.Node.EventType.TOUCH_START, this.onBeginDrag, this);
         this.node.off(cc.Node.EventType.TOUCH_END, this.onEndDrag, this);
+        cc.systemEvent.on(Drop.ON_DROP_EVENT, this.onReceiveDropResult, this);
+    }
+
+    private onReceiveDropResult(result: DropResult)
+    {
+        if (result.drag === this)
+        {
+            this._dropCount++;
+        }
     }
 
     private onBeginDrag()
@@ -66,6 +89,7 @@ export default class Drag extends Interactable
             return;
 
         Drag.beingDrag = this;
+        this._dragCount++;
         this.node.setSiblingIndex(99);
         this.node.on(cc.Node.EventType.TOUCH_MOVE, this.onDrag, this);
 
