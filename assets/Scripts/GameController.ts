@@ -98,7 +98,7 @@ export default class GameController extends cc.Component
     {
         this.levelManager.node.active = false;
         this.hideDemo();
-        this.scoreDisplay.node.active = true;
+        this.scoreDisplay.show();
     }
 
     private hideDemo()
@@ -108,7 +108,7 @@ export default class GameController extends cc.Component
 
     private hideScore()
     {
-        this.scoreDisplay.node.active = false;
+        this.scoreDisplay.hide();
     }
     //#endregion
 

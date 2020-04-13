@@ -9,8 +9,8 @@ import FadeInData from "./FadeInData";
 import HoverEffect from "./HoverAndClick/HoverEffect";
 import ButtonColor, { ButtonState } from "./HoverAndClick/ButtonColor";
 import Assert from "./Assert";
-import Chains from "./Chain";
 import AudioManager from "./AudioManager";
+import Chains, { ChainFunction } from "./Chains/Chains";
 
 const { ccclass, property } = cc._decorator;
 
@@ -70,59 +70,8 @@ export default class Demo extends cc.Component
     public play()
     {
         this.resetToOriginal();
-        let moveMouseDownABit = cc.v2(0, -30);
         this.node.active = true;
-
-        let audioManager = AudioManager.instance;
-
-        let chains =  new Chains("Demo");
-        chains.add(
-            Chains.wait(chains, 1.5),
-            Chains.fadeIn(chains, this.title, 1),
-            Chains.parallel(
-                audioManager.chain("demo-title"),
-                Chains.bouncing(chains, this.title, 1.1, 1)
-            ),
-            Chains.wait(chains, 1.5),
-            Chains.moveToPosition(chains, this.title, 1, this._titleOriginalPos),
-            this.fadeInAllNodes(() => chains.done()),
-            Chains.parallel(
-                () => this.bubble.opacity = 255,
-                audioManager.chain("demo-how-to-play", () => chains.done())
-            ),
-            this.flashingItems("Item", 0.3, 4, () => chains.done()),
-            Chains.parallel(
-                () => this.cursor.opacity = 255,
-                Chains.moveToNode(chains, this.cursor, 0.7, this.drag, moveMouseDownABit)
-            ),
-            this.hoverDrag(chains, 2),
-            this.clickDrag(chains),
-            Chains.wait(chains, 1),
-            Chains.parallel(
-                Chains.moveToNode(null, this.cursor, 1, this.drop, moveMouseDownABit),
-                Chains.moveToNode(chains, this.drag, 1, this.drop)
-            ),
-            this.dropDrag(chains),
-            Chains.wait(chains, 0.5),
-            this.dragCorrect(chains),
-            Chains.wait(chains, 0.5),
-            Chains.moveToNode(chains, this.cursor, 1, this.stopButton, moveMouseDownABit),
-            Chains.parallel(
-                Chains.bouncing(chains, this.stopButton, 1.2, 4),
-                audioManager.chain("demo-x-icon")
-            ),
-            Chains.moveToNode(chains, this.cursor, 1, this.infoButton, moveMouseDownABit),
-            Chains.parallel(
-                Chains.bouncing(chains, this.infoButton, 1.2, 4),
-                audioManager.chain("demo-i-icon")
-            ),
-            Chains.moveToNode(chains, this.cursor, 1, this.playButton, moveMouseDownABit),
-            Chains.parallel(
-                Chains.bouncing(chains, this.playButton, 1.2, 4),
-                audioManager.chain(this._isFirstPlay ? "demo-start-btn" : "demo-resume-btn")
-            )
-        );
-        chains.play();
+        this.demoPlay();
     }
 
     public stop()
@@ -133,38 +82,6 @@ export default class Demo extends cc.Component
         this._isFirstPlay = false;
         this.node.active = false;
     }
-/* 
-    private playAudio(chain: Chains, audioName: string, waitToEnd: boolean): Function
-    {
-        return () =>
-        {
-            if (!MouseInput.audioCanPlay)
-            {
-                cc.log("Audio cannot start: " + audioName);
-            }
-            else
-            {
-                cc.log("Play audio: " + audioName);
-                let obj = this.allAudio.find(x => x.audioName === audioName);
-                if (obj)
-                {
-                    let audioId = cc.audioEngine.playEffect(obj.audioClip, false);
-                    this._audioIsPlaying.set(audioId, true);
-                    cc.audioEngine.setFinishCallback(audioId, () =>
-                    {
-                        this._audioIsPlaying.delete(audioId)
-                        if (waitToEnd && chain)
-                        {
-                            chain.done();
-                            return;
-                        }
-                    });
-                }
-            }
-            if (chain)
-                chain.done();
-        }
-    } */
 
     private fadeInAllNodes(callback: Function): Function
     {
@@ -227,7 +144,7 @@ export default class Demo extends cc.Component
     }
 
     //#region Drag Effect
-    private clickDrag(chain: Chains): Function
+    private clickDrag(callback: Function): Function
     {
         return () =>
         {
@@ -237,12 +154,11 @@ export default class Demo extends cc.Component
             {
                 hover.startClickEffect();
             }
-            if (chain)
-                chain.done();
+            callback();
         }
     }
 
-    private dropDrag(chain: Chains): Function
+    private dropDrag(callback: Function): Function
     {
         return () =>
         {
@@ -252,12 +168,11 @@ export default class Demo extends cc.Component
             {
                 hover.stopClickEffect(null);
             }
-            if (chain)
-                chain.done();
+            callback();
         }
     }
 
-    private dragCorrect(chain: Chains): Function
+    private dragCorrect(callback: Function): Function
     {
         return () =>
         {
@@ -267,28 +182,25 @@ export default class Demo extends cc.Component
             {
                 buttonState.ChangeState(ButtonState.Correct);
             }
-            if (chain)
-                chain.done();
+            callback();
         }
     }
 
-    private hoverDrag(chain: Chains, inSecond: number): Function
+    private hoverDrag(inSecond: number, callback: Function): Function
     {
         return () =>
         {
             let hover = this.drag.getComponent(HoverEffect);
             if (!hover)
             {
-                if (chain)
-                    chain.done();
+                callback();
                 return;
             }
             hover.startHoverEffect();
             setTimeout(() =>
             {
                 hover.stopHoverEffect();
-                if (chain)
-                    chain.done();
+                callback();
             }, inSecond * 1000);
         }
     }
@@ -319,5 +231,53 @@ export default class Demo extends cc.Component
         {
             // Chane Start Button to Resume Button
         }
+    }
+
+    private demoPlay()
+    {
+        let moveMouseDownABit = cc.v2(0, -30);
+        let audioManager = AudioManager.instance;
+
+        let chains = new Chains("Demo");
+        let onCompleted = () => chains.done();
+        chains
+            // Title animation
+            .waitForSec(1.5)
+            .addFadeInEffect(this.title, 1)
+            .dontWait(() => audioManager.play("demo-title"))
+            .addBouncingEffect(this.title, 1.1, 1)
+            .waitForSec(1.5)
+            .addMoveToPosition(this.title, 1, this._titleOriginalPos)
+
+            // Show all Items one by one
+            .addFunctions(this.fadeInAllNodes(onCompleted))
+            .dontWait(() => this.bubble.opacity = 255)
+            .addFunctions(audioManager.chain("demo-how-to-play", onCompleted))
+            .addFunctions(this.flashingItems("Item", 0.3, 4, onCompleted))
+
+            // Move cursor + drag & drop
+            .dontWait(() => this.cursor.opacity = 255)
+            .addMoveToNode(this.cursor, 0.7, this.drag, moveMouseDownABit)
+            .addFunctions(this.hoverDrag(2, onCompleted))
+            .addFunctions(this.clickDrag(onCompleted))
+            .waitForSec(1)
+            .dontWait(ChainFunction.moveToNode(this.cursor, 1, this.drop, moveMouseDownABit))
+            .addMoveToNode(this.drag, 1, this.drop)
+            .addFunctions(this.dropDrag(onCompleted))
+            .waitForSec(0.5)
+            .addFunctions(this.dragCorrect(onCompleted))
+            .waitForSec(0.5)
+
+            // Move cursor to all Buttons
+            .addMoveToNode(this.cursor, 1, this.stopButton, moveMouseDownABit)
+            .dontWait(() => audioManager.play("demo-x-icon"))
+            .addBouncingEffect(this.stopButton, 1.2, 4)
+            .addMoveToNode(this.cursor, 1, this.infoButton, moveMouseDownABit)
+            .dontWait(() => audioManager.play("demo-i-icon"))
+            .addBouncingEffect(this.infoButton, 1.2, 4)
+            .addMoveToNode(this.cursor, 1, this.playButton, moveMouseDownABit)
+            .dontWait(() => audioManager.play(this._isFirstPlay ? "demo-start-btn" : "demo-resume-btn"))
+            .addBouncingEffect(this.playButton, 1.2, 4)
+            .play();
     }
 }

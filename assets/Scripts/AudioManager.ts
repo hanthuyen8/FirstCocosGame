@@ -29,13 +29,10 @@ export default class AudioManager extends cc.Component
 
     onLoad()
     {
-        /*         if (this.node !== cc.Canvas.instance.node)
-                    throw new Error("Component này phải ngang cấp với Canvas cao nhất");
-                 */
         if (this.isSingletonAlreadyLoaded())
             return;
-        
-        cc.Canvas.instance.node.once(cc.Node.EventType.MOUSE_DOWN, () => cc.audioEngine.stopAllEffects());
+
+        this.detectInput();
 
         for (let i of this.data)
         {
@@ -46,6 +43,11 @@ export default class AudioManager extends cc.Component
 
             this._dataDict.set(i.audioName, new AudioMeta(i.audioClip));
         }
+    }
+
+    private detectInput()
+    {
+        cc.Canvas.instance.node.once(cc.Node.EventType.TOUCH_START, () => cc.audioEngine.stopAllEffects());
     }
 
     start()
@@ -93,7 +95,19 @@ export default class AudioManager extends cc.Component
         }
     }
 
-    public toggleBackgroundMusic(toggle : cc.Toggle)
+    public resumeBackgroundMusic()
+    {
+        if (this.backgroundMusic)
+            cc.audioEngine.resumeMusic();
+    }
+
+    public pauseBackgroundMusic()
+    {
+        if (this.backgroundMusic)
+            cc.audioEngine.pauseMusic();
+    }
+
+    private toggleBackgroundMusic(toggle: cc.Toggle)
     {
         if (this.backgroundMusic)
         {
@@ -104,7 +118,7 @@ export default class AudioManager extends cc.Component
         }
     }
 
-    private isSingletonAlreadyLoaded() : boolean
+    private isSingletonAlreadyLoaded(): boolean
     {
         if (AudioManager._instance == null || AudioManager._instance == undefined)
         {

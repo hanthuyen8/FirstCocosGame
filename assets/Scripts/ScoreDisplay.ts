@@ -9,6 +9,7 @@ import Assert from "./Assert";
 import GameController from "./GameController";
 import ChangeableSprite from "./ChangeableSprite";
 import AudioManager from "./AudioManager";
+import SimpleParticle from "./SimpleParticle";
 
 const { ccclass, property } = cc._decorator;
 
@@ -21,14 +22,21 @@ export default class ScoreDisplay extends cc.Component
     @property(ChangeableSprite)
     private teacherBubbleSpeech: ChangeableSprite = null;
 
+    @property({ type: [SimpleParticle] })
+    private particle: SimpleParticle[] = [];
+
     onLoad()
     {
         Assert.isNotNull(this.scoreLabel);
         Assert.isNotNull(this.teacherBubbleSpeech);
+        Assert.isNotEmpty(this.particle);
     }
 
-    onEnable()
+    show()
     {
+        AudioManager.instance.pauseBackgroundMusic();
+        this.node.active = true;
+        this.particle.forEach(x => x.play());
         AudioManager.instance.play("cheer");
         let score = GameController.instance.score;
         this.scoreLabel.string = score + "/5";
@@ -45,5 +53,12 @@ export default class ScoreDisplay extends cc.Component
                 this.teacherBubbleSpeech.show("excellent");
                 break;
         }
+    }
+
+    hide()
+    {
+        this.particle.forEach(x => x.stop());
+        this.node.active = false;
+        AudioManager.instance.resumeBackgroundMusic();
     }
 }

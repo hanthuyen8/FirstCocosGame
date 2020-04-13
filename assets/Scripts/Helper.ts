@@ -22,4 +22,10 @@ export default class Helper
     {
         return Helper.convertToSameSpace(base, target, target.getPosition());
     }
+
+    public static uniqueString(): string
+    {
+        let thisTime = new Date();
+        return `${thisTime.getHours}${thisTime.getMinutes}${thisTime.getSeconds}${thisTime.getMilliseconds}`;
+    }
 }

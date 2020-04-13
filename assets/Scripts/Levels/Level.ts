@@ -7,8 +7,8 @@
 
 import FadeInData from "../FadeInData";
 import Assert from "../Assert";
-import Chains from "../Chain";
 import Interactable from "../Interfaces/Interactable";
+import Chains from "../Chains/Chains";
 
 const { ccclass, property } = cc._decorator;
 
@@ -45,11 +45,10 @@ export default class Level extends cc.Component
         let chains = new Chains("Level" + this._id);
         for (let i of this.willFadeIn)
         {
-            chains.add(
-                Chains.fadeIn(chains, i.anyNode, i.fadeSpeed),
-                Chains.wait(chains, this.waitTimeBetweenNode));
+            chains.addFadeInEffect(i.anyNode, i.fadeSpeed);
+            chains.waitForSec(this.waitTimeBetweenNode);
         }
-        chains.add(() => { this.enableInteractables(); chains.done() });
+        chains.addFunctions(() => { this.enableInteractables(); chains.done() });
         chains.play();
     }
 

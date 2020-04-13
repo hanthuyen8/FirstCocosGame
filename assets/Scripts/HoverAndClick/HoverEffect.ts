@@ -27,12 +27,7 @@ export default class HoverEffect extends Interactable
         Assert.isNotNull(this.hoverLayer);
         this.hoverLayer.opacity = 0;
     }
-
-    start()
-    {
-        cc.log(this.name+ " " + this.interactable);
-    }
-
+    
     public startHoverEffect()
     {
         this.stopTween();
@@ -82,7 +77,6 @@ export default class HoverEffect extends Interactable
 
     protected subscribeInputEvents()
     {
-        cc.log("sub");
         this.unsubscribeInputEvents();
         if (cc.sys.platform == cc.sys.DESKTOP_BROWSER)
         {
@@ -95,7 +89,6 @@ export default class HoverEffect extends Interactable
 
     protected unsubscribeInputEvents()
     {
-        cc.log("unsub");
         if (cc.sys.platform == cc.sys.DESKTOP_BROWSER)
         {
             this.node.off(cc.Node.EventType.MOUSE_ENTER, this.startHoverEffect, this);

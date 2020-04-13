@@ -13,26 +13,24 @@ const { ccclass, property } = cc._decorator;
 @ccclass
 export default class ChangeableSprite extends cc.Component
 {
-
     @property([ChangeableSpriteData])
     private data: ChangeableSpriteData[] = [];
 
-    private sprite: cc.Sprite = null;
-
+    private _sprite: cc.Sprite = null;
     private _dataMap: Map<string, cc.SpriteFrame> = new Map;
 
     onLoad()
     {
         Assert.isNotEmpty(this.data);
 
-        this.sprite = this.getComponent(cc.Sprite);
-        Assert.isNotNull(this.sprite, "Không tìm thấy Component: Sprite");
+        this._sprite = this.getComponent(cc.Sprite);
+        Assert.isNotNull(this._sprite, "Không tìm thấy Component: Sprite");
 
         for (let i of this.data)
         {
             i.id = i.id.trim();
             if (i.id == "" || this._dataMap.has(i.id))
-                throw new Error("Dat không thể có id bị trùng.");
+                throw new Error("Data không thể có id bị trùng.");
 
             this._dataMap.set(i.id, i.spriteFrame);
         }
@@ -40,15 +38,15 @@ export default class ChangeableSprite extends cc.Component
 
     public hide()
     {
-        this.sprite.spriteFrame = null;
+        this._sprite.spriteFrame = null;
     }
 
     public show(id: string)
     {
         if (!this._dataMap.has(id))
             throw new Error("id: " + id + " không tồn tại.");
-
-        this.sprite.spriteFrame = this._dataMap.get(id);
+        
+        this._sprite.spriteFrame = this._dataMap.get(id);
     }
 
     public showTimeout(id: string, inSecond: number)
