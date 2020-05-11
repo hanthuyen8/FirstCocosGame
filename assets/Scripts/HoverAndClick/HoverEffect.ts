@@ -5,7 +5,6 @@
 // Learn life-cycle callbacks:
 //  - https://docs.cocos.com/creator/manual/en/scripting/life-cycle-callbacks.html
 
-import Helper from "../Helper";
 import Assert from "../Assert";
 import Interactable from "../Interfaces/Interactable";
 

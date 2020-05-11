@@ -5,8 +5,8 @@
 // Learn life-cycle callbacks:
 //  - https://docs.cocos.com/creator/manual/en/scripting/life-cycle-callbacks.html
 
-import Assert from "./Assert";
 import ChangeableSpriteData from "./ChangeableSpriteData";
+import Assert from "../Assert";
 
 const { ccclass, property } = cc._decorator;
 

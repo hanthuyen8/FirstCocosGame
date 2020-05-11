@@ -11,6 +11,7 @@ import ButtonColor, { ButtonState } from "./HoverAndClick/ButtonColor";
 import Assert from "./Assert";
 import AudioManager from "./AudioManager";
 import Chains, { ChainFunction } from "./Chains/Chains";
+import BubblesController from "./Bubbles/BubblesController";
 
 const { ccclass, property } = cc._decorator;
 
@@ -25,9 +26,6 @@ export default class Demo extends cc.Component
 
     @property
     private waitTimeBetweenNode = 0.7;
-
-    @property(cc.Node)
-    private bubble: cc.Node = null;
 
     @property(cc.Node)
     private cursor: cc.Node = null;
@@ -223,7 +221,7 @@ export default class Demo extends cc.Component
             current.anyNode.opacity = 0;
         }
         this.cursor.opacity = 0;
-        this.bubble.opacity = 0;
+        BubblesController.Instance.show("Teacher");
         this.title.opacity = 0;
         this.title.setPosition(0, 0);
         this.resetDrag();
@@ -251,7 +249,7 @@ export default class Demo extends cc.Component
 
             // Show all Items one by one
             .addFunctions(this.fadeInAllNodes(onCompleted))
-            .dontWait(() => this.bubble.opacity = 255)
+            .dontWait(() => BubblesController.Instance.show("Teacher", "Demo"))
             .addFunctions(audioManager.chain("demo-how-to-play", onCompleted))
             .addFunctions(this.flashingItems("Item", 0.3, 4, onCompleted))
 

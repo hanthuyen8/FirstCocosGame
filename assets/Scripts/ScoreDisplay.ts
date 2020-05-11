@@ -7,8 +7,8 @@
 
 import Assert from "./Assert";
 import GameController from "./GameController";
-import ChangeableSprite from "./ChangeableSprite";
 import AudioManager from "./AudioManager";
+import ChangeableSprite from "./Bubbles/ChangeableSprite";
 
 const { ccclass, property } = cc._decorator;
 
@@ -67,7 +67,7 @@ export default class ScoreDisplay extends cc.Component
     }
 }
 
-@ccclass("ScoreJson")
+//@ccclass("ScoreJson")
 class ScoreJson
 {
     public total :number = 0;

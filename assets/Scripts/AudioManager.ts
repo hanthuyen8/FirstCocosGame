@@ -21,7 +21,7 @@ export default class AudioManager extends cc.Component
     public musicVolume: number = 0.2;
 
     @property({ type: [AudioData] })
-    public data: AudioData[] = []
+    private data: AudioData[] = []
 
     private static _instance: AudioManager = null;
 
