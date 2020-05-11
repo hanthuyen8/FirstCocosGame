@@ -9,9 +9,10 @@ import Assert from "./Assert";
 import GameController from "./GameController";
 import ChangeableSprite from "./ChangeableSprite";
 import AudioManager from "./AudioManager";
-import SimpleParticle from "./SimpleParticle";
 
 const { ccclass, property } = cc._decorator;
+
+declare let sendScore: Function;
 
 @ccclass
 export default class ScoreDisplay extends cc.Component
@@ -22,8 +23,8 @@ export default class ScoreDisplay extends cc.Component
     @property(ChangeableSprite)
     private teacherBubbleSpeech: ChangeableSprite = null;
 
-    @property({ type: [SimpleParticle] })
-    private particle: SimpleParticle[] = [];
+    @property({ type: [cc.ParticleSystem] })
+    private particle: cc.ParticleSystem[] = [];
 
     onLoad()
     {
@@ -36,7 +37,7 @@ export default class ScoreDisplay extends cc.Component
     {
         AudioManager.instance.pauseBackgroundMusic();
         this.node.active = true;
-        this.particle.forEach(x => x.play());
+        this.particle.forEach(x => x.resetSystem());
         AudioManager.instance.play("cheer");
         let score = GameController.instance.score;
         this.scoreLabel.string = score + "/5";
@@ -53,12 +54,37 @@ export default class ScoreDisplay extends cc.Component
                 this.teacherBubbleSpeech.show("excellent");
                 break;
         }
+
+        let scoreJSon = new ScoreJson(5,5,5,5);
+        scoreJSon.Send();
     }
 
     hide()
     {
-        this.particle.forEach(x => x.stop());
+        this.particle.forEach(x => x.stopSystem());
         this.node.active = false;
         AudioManager.instance.resumeBackgroundMusic();
+    }
+}
+
+@ccclass("ScoreJson")
+class ScoreJson
+{
+    public total :number = 0;
+    public maxscore : number = 0;
+    public right : number = 0;
+    public score : number = 0;
+
+    constructor(total : number, maxscore : number, right:number, score:number)
+    {
+        this.total = total;
+        this.maxscore = maxscore;
+        this.right = right;
+        this.score = score;
+    }
+
+    public Send()
+    {
+        sendScore(JSON.stringify(this));
     }
 }

@@ -47,7 +47,6 @@ export default class Drop extends cc.Component
             // Chỉ nhận DragId nào trùng với acceptedDragId
             result = true;
         }
-        cc.log(result);
         cc.systemEvent.emit(Drop.ON_DROP_EVENT, new DropResult(result, drag, this));
     }
 

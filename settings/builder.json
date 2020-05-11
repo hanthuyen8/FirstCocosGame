@@ -12,7 +12,7 @@
     "portrait": false,
     "upsideDown": false
   },
-  "webOrientation": "landscape",
+  "webOrientation": "auto",
   "inlineSpriteFrames": true,
   "inlineSpriteFrames_native": true,
   "mergeStartScene": false,

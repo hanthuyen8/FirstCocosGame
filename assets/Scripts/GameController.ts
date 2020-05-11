@@ -55,6 +55,7 @@ export default class GameController extends cc.Component
 
         cc.systemEvent.on(Drop.ON_DROP_EVENT, this.onSomethingDropped, this);
         cc.systemEvent.on(LevelManager.LEVEL_CHANGE_EVENT, this.onLevelChanged, this);
+        cc.systemEvent.on(LevelManager.LEVEL_MAX_EVENT, this.onFinal, this);
     }
 
     start()
@@ -66,6 +67,7 @@ export default class GameController extends cc.Component
     {
         cc.systemEvent.off(Drop.ON_DROP_EVENT, this.onSomethingDropped, this);
         cc.systemEvent.off(LevelManager.LEVEL_CHANGE_EVENT, this.onLevelChanged, this);
+        cc.systemEvent.off(LevelManager.LEVEL_MAX_EVENT, this.onFinal, this)
     }
     //#region Menu
     public startToPlay()
@@ -111,6 +113,11 @@ export default class GameController extends cc.Component
         this.scoreDisplay.hide();
     }
     //#endregion
+
+    private onFinal()
+    {
+        this.scoreDisplay.show();
+    }
 
     private onLevelChanged(levelIndex: number)
     {

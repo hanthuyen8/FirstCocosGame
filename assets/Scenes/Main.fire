@@ -10727,7 +10727,7 @@
   },
   {
     "__type__": "cc.Node",
-    "_name": "Firework particle 1",
+    "_name": "Firework 1",
     "_objFlags": 0,
     "_parent": {
       "__id__": 276
@@ -10750,8 +10750,8 @@
     },
     "_contentSize": {
       "__type__": "cc.Size",
-      "width": 908,
-      "height": 541
+      "width": 0,
+      "height": 0
     },
     "_anchorPoint": {
       "__type__": "cc.Vec2",
@@ -10762,8 +10762,8 @@
       "__type__": "TypedArray",
       "ctor": "Float64Array",
       "array": [
-        -2,
-        -1,
+        0,
+        0,
         0,
         0,
         0,
@@ -10785,28 +10785,114 @@
     "_is3DNode": false,
     "_groupIndex": 0,
     "groupIndex": 0,
-    "_id": "e9AL997HFMU7sz2M/ZGVGJ"
+    "_id": "94t1sBn91I1bl2I2QOrx/G"
   },
   {
-    "__type__": "8468deQ8XFMN4xJe3Mdyak1",
+    "__type__": "cc.ParticleSystem",
     "_name": "",
     "_objFlags": 0,
     "node": {
       "__id__": 277
     },
     "_enabled": true,
-    "spriteFrame": {
+    "_materials": [
+      {
+        "__uuid__": "eca5d2f2-8ef6-41c2-bbe6-f9c79d09c432"
+      }
+    ],
+    "_srcBlendFactor": 770,
+    "_dstBlendFactor": 771,
+    "_custom": true,
+    "_file": {
+      "__uuid__": "d334791f-0e8d-4bba-9777-c791840964aa"
+    },
+    "_spriteFrame": {
       "__uuid__": "b18902ab-6562-4961-ae36-61ad8ec179c9"
     },
-    "lifeTime": 2,
-    "maxSize": 1.5,
-    "quantity": 10,
-    "spawnTime": 1,
-    "_id": "8eZkYvAm1JIbRYhA2Ap9pk"
+    "_texture": null,
+    "_stopped": true,
+    "playOnLoad": false,
+    "autoRemoveOnFinish": false,
+    "totalParticles": 5,
+    "duration": 5,
+    "emissionRate": 5,
+    "life": 2,
+    "lifeVar": 2,
+    "_startColor": {
+      "__type__": "cc.Color",
+      "r": 255,
+      "g": 255,
+      "b": 255,
+      "a": 255
+    },
+    "_startColorVar": {
+      "__type__": "cc.Color",
+      "r": 0,
+      "g": 0,
+      "b": 0,
+      "a": 0
+    },
+    "_endColor": {
+      "__type__": "cc.Color",
+      "r": 255,
+      "g": 255,
+      "b": 255,
+      "a": 255
+    },
+    "_endColorVar": {
+      "__type__": "cc.Color",
+      "r": 0,
+      "g": 0,
+      "b": 0,
+      "a": 0
+    },
+    "angle": 0,
+    "angleVar": 0,
+    "startSize": 0,
+    "startSizeVar": 0,
+    "endSize": 100,
+    "endSizeVar": 150,
+    "startSpin": 0,
+    "startSpinVar": 0,
+    "endSpin": 0,
+    "endSpinVar": 0,
+    "sourcePos": {
+      "__type__": "cc.Vec2",
+      "x": 0,
+      "y": 0
+    },
+    "posVar": {
+      "__type__": "cc.Vec2",
+      "x": 400,
+      "y": 200
+    },
+    "_positionType": 1,
+    "positionType": 1,
+    "emitterMode": 0,
+    "gravity": {
+      "__type__": "cc.Vec2",
+      "x": 0,
+      "y": 0
+    },
+    "speed": 1,
+    "speedVar": 1,
+    "tangentialAccel": 0,
+    "tangentialAccelVar": 0,
+    "radialAccel": 0,
+    "radialAccelVar": 0,
+    "rotationIsDir": false,
+    "startRadius": 300,
+    "startRadiusVar": 300,
+    "endRadius": 300,
+    "endRadiusVar": 300,
+    "rotatePerS": 0,
+    "rotatePerSVar": 0,
+    "_N$preview": true,
+    "_id": "b1EDEAKvNIyLEC+39b6ZK0"
   },
   {
     "__type__": "cc.Node",
-    "_name": "Firework particle 2",
+    "_name": "Firework 2",
     "_objFlags": 0,
     "_parent": {
       "__id__": 276
@@ -10829,8 +10915,8 @@
     },
     "_contentSize": {
       "__type__": "cc.Size",
-      "width": 908,
-      "height": 541
+      "width": 0,
+      "height": 0
     },
     "_anchorPoint": {
       "__type__": "cc.Vec2",
@@ -10841,8 +10927,8 @@
       "__type__": "TypedArray",
       "ctor": "Float64Array",
       "array": [
-        -2,
-        -1,
+        0,
+        0,
         0,
         0,
         0,
@@ -10864,28 +10950,114 @@
     "_is3DNode": false,
     "_groupIndex": 0,
     "groupIndex": 0,
-    "_id": "98kfHc1YNMlorsYlAMVnaL"
+    "_id": "edl+tF6i5BkLFlG3Bw17UN"
   },
   {
-    "__type__": "8468deQ8XFMN4xJe3Mdyak1",
+    "__type__": "cc.ParticleSystem",
     "_name": "",
     "_objFlags": 0,
     "node": {
       "__id__": 279
     },
     "_enabled": true,
-    "spriteFrame": {
+    "_materials": [
+      {
+        "__uuid__": "eca5d2f2-8ef6-41c2-bbe6-f9c79d09c432"
+      }
+    ],
+    "_srcBlendFactor": 770,
+    "_dstBlendFactor": 771,
+    "_custom": true,
+    "_file": {
+      "__uuid__": "d334791f-0e8d-4bba-9777-c791840964aa"
+    },
+    "_spriteFrame": {
       "__uuid__": "4368218f-8b1a-4949-b028-cb9511a5ab2a"
     },
-    "lifeTime": 1.5,
-    "maxSize": 1.2,
-    "quantity": 5,
-    "spawnTime": 1.5,
-    "_id": "386pGHCBVPrahwNx+Wfq8F"
+    "_texture": null,
+    "_stopped": true,
+    "playOnLoad": false,
+    "autoRemoveOnFinish": false,
+    "totalParticles": 5,
+    "duration": 5,
+    "emissionRate": 5,
+    "life": 2,
+    "lifeVar": 2,
+    "_startColor": {
+      "__type__": "cc.Color",
+      "r": 255,
+      "g": 255,
+      "b": 255,
+      "a": 255
+    },
+    "_startColorVar": {
+      "__type__": "cc.Color",
+      "r": 0,
+      "g": 0,
+      "b": 0,
+      "a": 0
+    },
+    "_endColor": {
+      "__type__": "cc.Color",
+      "r": 255,
+      "g": 255,
+      "b": 255,
+      "a": 255
+    },
+    "_endColorVar": {
+      "__type__": "cc.Color",
+      "r": 0,
+      "g": 0,
+      "b": 0,
+      "a": 0
+    },
+    "angle": 0,
+    "angleVar": 0,
+    "startSize": 0,
+    "startSizeVar": 0,
+    "endSize": 100,
+    "endSizeVar": 150,
+    "startSpin": 0,
+    "startSpinVar": 0,
+    "endSpin": 0,
+    "endSpinVar": 0,
+    "sourcePos": {
+      "__type__": "cc.Vec2",
+      "x": 0,
+      "y": 0
+    },
+    "posVar": {
+      "__type__": "cc.Vec2",
+      "x": 400,
+      "y": 200
+    },
+    "_positionType": 1,
+    "positionType": 1,
+    "emitterMode": 0,
+    "gravity": {
+      "__type__": "cc.Vec2",
+      "x": 0,
+      "y": 0
+    },
+    "speed": 1,
+    "speedVar": 1,
+    "tangentialAccel": 0,
+    "tangentialAccelVar": 0,
+    "radialAccel": 0,
+    "radialAccelVar": 0,
+    "rotationIsDir": false,
+    "startRadius": 300,
+    "startRadiusVar": 300,
+    "endRadius": 300,
+    "endRadiusVar": 300,
+    "rotatePerS": 0,
+    "rotatePerSVar": 0,
+    "_N$preview": true,
+    "_id": "c4SmRm5aVJGro4F16/puNc"
   },
   {
     "__type__": "cc.Node",
-    "_name": "Firework particle 3",
+    "_name": "Firework 3",
     "_objFlags": 0,
     "_parent": {
       "__id__": 276
@@ -10908,8 +11080,8 @@
     },
     "_contentSize": {
       "__type__": "cc.Size",
-      "width": 908,
-      "height": 541
+      "width": 0,
+      "height": 0
     },
     "_anchorPoint": {
       "__type__": "cc.Vec2",
@@ -10920,8 +11092,8 @@
       "__type__": "TypedArray",
       "ctor": "Float64Array",
       "array": [
-        -2,
-        -1,
+        0,
+        0,
         0,
         0,
         0,
@@ -10943,24 +11115,110 @@
     "_is3DNode": false,
     "_groupIndex": 0,
     "groupIndex": 0,
-    "_id": "12Ed/Sl4hO47D8vmiibOYi"
+    "_id": "f5ted34RRMYZw0mkBYZ+L+"
   },
   {
-    "__type__": "8468deQ8XFMN4xJe3Mdyak1",
+    "__type__": "cc.ParticleSystem",
     "_name": "",
     "_objFlags": 0,
     "node": {
       "__id__": 281
     },
     "_enabled": true,
-    "spriteFrame": {
+    "_materials": [
+      {
+        "__uuid__": "eca5d2f2-8ef6-41c2-bbe6-f9c79d09c432"
+      }
+    ],
+    "_srcBlendFactor": 770,
+    "_dstBlendFactor": 771,
+    "_custom": true,
+    "_file": {
+      "__uuid__": "d334791f-0e8d-4bba-9777-c791840964aa"
+    },
+    "_spriteFrame": {
       "__uuid__": "9bc61969-31a7-4c36-baad-ccfbd27f007e"
     },
-    "lifeTime": 1,
-    "maxSize": 1,
-    "quantity": 5,
-    "spawnTime": 0.5,
-    "_id": "f7Fi9A8UtLzaePTfzpdplm"
+    "_texture": null,
+    "_stopped": true,
+    "playOnLoad": false,
+    "autoRemoveOnFinish": false,
+    "totalParticles": 5,
+    "duration": 5,
+    "emissionRate": 5,
+    "life": 2,
+    "lifeVar": 2,
+    "_startColor": {
+      "__type__": "cc.Color",
+      "r": 255,
+      "g": 255,
+      "b": 255,
+      "a": 255
+    },
+    "_startColorVar": {
+      "__type__": "cc.Color",
+      "r": 0,
+      "g": 0,
+      "b": 0,
+      "a": 0
+    },
+    "_endColor": {
+      "__type__": "cc.Color",
+      "r": 255,
+      "g": 255,
+      "b": 255,
+      "a": 255
+    },
+    "_endColorVar": {
+      "__type__": "cc.Color",
+      "r": 0,
+      "g": 0,
+      "b": 0,
+      "a": 0
+    },
+    "angle": 0,
+    "angleVar": 0,
+    "startSize": 0,
+    "startSizeVar": 0,
+    "endSize": 100,
+    "endSizeVar": 150,
+    "startSpin": 0,
+    "startSpinVar": 0,
+    "endSpin": 0,
+    "endSpinVar": 0,
+    "sourcePos": {
+      "__type__": "cc.Vec2",
+      "x": 0,
+      "y": 0
+    },
+    "posVar": {
+      "__type__": "cc.Vec2",
+      "x": 400,
+      "y": 200
+    },
+    "_positionType": 1,
+    "positionType": 1,
+    "emitterMode": 0,
+    "gravity": {
+      "__type__": "cc.Vec2",
+      "x": 0,
+      "y": 0
+    },
+    "speed": 1,
+    "speedVar": 1,
+    "tangentialAccel": 0,
+    "tangentialAccelVar": 0,
+    "radialAccel": 0,
+    "radialAccelVar": 0,
+    "rotationIsDir": false,
+    "startRadius": 300,
+    "startRadiusVar": 300,
+    "endRadius": 300,
+    "endRadiusVar": 300,
+    "rotatePerS": 0,
+    "rotatePerSVar": 0,
+    "_N$preview": true,
+    "_id": "7bGuxt3GhAdJ8jpIXFVA6j"
   },
   {
     "__type__": "cc.Node",
@@ -12152,7 +12410,7 @@
       "array": [
         0,
         0,
-        536.9357503463519,
+        264.1377481542538,
         0,
         0,
         0,

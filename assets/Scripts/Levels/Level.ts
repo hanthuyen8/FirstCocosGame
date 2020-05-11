@@ -24,7 +24,7 @@ export default class Level extends cc.Component
     private _allInteractables: Interactable[] = [];
 
     private _isLevelLoaded = false;
-    private _id: number;
+    private _levelId: number = Number.MIN_SAFE_INTEGER;
 
     onLoad()
     {
@@ -34,7 +34,7 @@ export default class Level extends cc.Component
 
     public init(levelId: number)
     {
-        this._id = levelId;
+        this._levelId = levelId;
     }
 
     public show()
@@ -42,19 +42,19 @@ export default class Level extends cc.Component
         this.resetLevel();
         this.node.active = true;
 
-        let chains = new Chains("Level" + this._id);
+        let chains = new Chains("Level" + this._levelId);
         for (let i of this.willFadeIn)
         {
             chains.addFadeInEffect(i.anyNode, i.fadeSpeed);
             chains.waitForSec(this.waitTimeBetweenNode);
         }
-        chains.addFunctions(() => { this.enableInteractables(); chains.done() });
+        chains.addFunctions(() => { this.enableInteractables(); chains.done(); });
         chains.play();
     }
 
     public hide()
     {
-        Chains.stop("Level" + this._id);
+        Chains.stop("Level" + this._levelId);
         this.node.active = false;
     }
 

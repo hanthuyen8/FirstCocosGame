@@ -17,6 +17,8 @@ export default class LevelManager extends cc.Component
     public levels: Level[] = [];
 
     public static readonly LEVEL_CHANGE_EVENT = "LEVEL_CHANGE_EVENT";
+    public static readonly LEVEL_MAX_EVENT = "LEVEL_MAX_EVENT";
+
     public get currentLevelIndex(): number { return this._currentLevelIndex; }
     public get currentLevel(): Level { return this.levels[this._currentLevelIndex]; }
 
@@ -44,7 +46,13 @@ export default class LevelManager extends cc.Component
 
     public showNextLevel()
     {
-        let show = this.isLevelExist(this._currentLevelIndex + 1);
+        let nextLevelIndex = this._currentLevelIndex + 1;
+        if (nextLevelIndex >= this.levels.length)
+        {
+            this.currentLevel.hide();
+            cc.systemEvent.emit(LevelManager.LEVEL_MAX_EVENT, this._currentLevelIndex);
+        }
+        let show = this.isLevelExist(nextLevelIndex);
 
         if (show)
         {

@@ -52,6 +52,7 @@ export default class Chains
 
     public static stop(id: string)
     {
+        cc.log(id);
         if (Chains._allActiveChains.has(id))
         {
             let c = Chains._allActiveChains.get(id);
